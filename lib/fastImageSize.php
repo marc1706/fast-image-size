@@ -106,66 +106,7 @@ class fastImageSize
 		{
 			$extension = (isset($match[1])) ? $match[1] : preg_replace('/.+\/([a-z0-9-.]+)$/i', '$1', $type);
 
-			// Reset size info
-			$this->size = array();
-
-			switch ($extension)
-			{
-				case 'png':
-					$this->get_png_size($file);
-					break;
-
-				case 'gif':
-					$this->get_gif_size($file);
-					break;
-
-				case 'jpeg':
-				case 'jpg':
-				case 'jpe':
-				case 'jif':
-				case 'jfif':
-				case 'jfi':
-					$this->get_jpeg_size($file);
-					break;
-
-				case 'jp2':
-				case 'j2k':
-				case 'jpf':
-				case 'jpg2':
-				case 'jpx':
-				case 'jpm':
-					$this->get_jp2_size($file);
-					break;
-
-				case 'psd':
-				case 'photoshop':
-					$this->get_psd_size($file);
-					break;
-
-				case 'bmp':
-					$this->get_bmp_size($file);
-					break;
-
-				case 'tif':
-				case 'tiff':
-					// get_tif_size() sets mime type
-					$this->get_tif_size($file);
-					break;
-
-				case 'wbm':
-				case 'wbmp':
-				case 'vnd.wap.wbmp':
-					$this->get_wbmp_size($file);
-					break;
-
-				case 'iff':
-				case 'x-iff':
-					$this->get_iff_size($file);
-					break;
-
-				default:
-					return false;
-			}
+			$this->getImageSizeByExtension($file, $extension);
 		}
 
 		return sizeof($this->size) > 1 ? $this->size : false;
@@ -194,6 +135,73 @@ class fastImageSize
 					break;
 				}
 			}
+		}
+	}
+
+	/**
+	 * Get image size by file extension
+	 *
+	 * @param string $file Path to image that should be checked
+	 * @param string $extension Extension/type of image
+	 */
+	protected function getImageSizeByExtension($file, $extension)
+	{
+		switch ($extension)
+		{
+			case 'png':
+				$this->get_png_size($file);
+				break;
+
+			case 'gif':
+				$this->get_gif_size($file);
+				break;
+
+			case 'jpeg':
+			case 'jpg':
+			case 'jpe':
+			case 'jif':
+			case 'jfif':
+			case 'jfi':
+				$this->get_jpeg_size($file);
+				break;
+
+			case 'jp2':
+			case 'j2k':
+			case 'jpf':
+			case 'jpg2':
+			case 'jpx':
+			case 'jpm':
+				$this->get_jp2_size($file);
+				break;
+
+			case 'psd':
+			case 'photoshop':
+				$this->get_psd_size($file);
+				break;
+
+			case 'bmp':
+				$this->get_bmp_size($file);
+				break;
+
+			case 'tif':
+			case 'tiff':
+				// get_tif_size() sets mime type
+				$this->get_tif_size($file);
+				break;
+
+			case 'wbm':
+			case 'wbmp':
+			case 'vnd.wap.wbmp':
+				$this->get_wbmp_size($file);
+				break;
+
+			case 'iff':
+			case 'x-iff':
+				$this->get_iff_size($file);
+				break;
+
+			default:
+				// Nothing to do
 		}
 	}
 

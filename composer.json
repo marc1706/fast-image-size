@@ -21,8 +21,8 @@
   },
   "autoload": {
     "psr-4": {
-      "fast-image-size\\": "/lib",
-      "fast-image-size\\tests\\": "/tests"
+      "fastImageSize\\": "/lib",
+      "fastImageSize\\tests\\": "/tests"
     }
   }
 }

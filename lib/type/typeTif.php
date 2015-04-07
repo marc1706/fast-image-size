@@ -29,6 +29,15 @@ class typeTif extends typeBase
 	/** @var int TIF IFD entry size */
 	const TIF_IFD_ENTRY_SIZE = 12;
 
+	/** @var array Size info array */
+	protected $size;
+
+	/** @var string Bit type of long field */
+	protected $type_long;
+
+	/** @var string Bit type of short field */
+	protected $type_short;
+
 	/**
 	 * {@inheritdoc}
 	 */
@@ -37,7 +46,7 @@ class typeTif extends typeBase
 		// Do not force length of header
 		$data = $this->fastImageSize->get_image($filename, 0, self::TIF_HEADER_SIZE, false);
 
-		$size = array();
+		$this->size = array();
 
 		$signature = substr($data, 0, self::SHORT_SIZE);
 
@@ -46,24 +55,14 @@ class typeTif extends typeBase
 			return;
 		}
 
-		if ($signature === "II")
-		{
-			$type_long = 'V';
-			$type_short = 'v';
-			$size['type'] = IMAGETYPE_TIFF_II;
-		}
-		else
-		{
-			$type_long = 'N';
-			$type_short = 'n';
-			$size['type'] = IMAGETYPE_TIFF_MM;
-		}
+		// Set byte type
+		$this->setByteType($signature);
 
 		// Get offset of IFD
-		list(, $offset) = unpack($type_long, substr($data, self::LONG_SIZE, self::LONG_SIZE));
+		list(, $offset) = unpack($this->type_long, substr($data, self::LONG_SIZE, self::LONG_SIZE));
 
 		// Get size of IFD
-		list(, $size_ifd) = unpack($type_short, substr($data, $offset, self::SHORT_SIZE));
+		list(, $size_ifd) = unpack($this->type_short, substr($data, $offset, self::SHORT_SIZE));
 
 		// Skip 2 bytes that define the IFD size
 		$offset += self::SHORT_SIZE;
@@ -72,27 +71,64 @@ class typeTif extends typeBase
 		for ($i = 0; $i < $size_ifd; $i++)
 		{
 			// Get IFD tag
-			$type = unpack($type_short, substr($data, $offset, self::SHORT_SIZE));
+			$type = unpack($this->type_short, substr($data, $offset, self::SHORT_SIZE));
 
 			// Get field type of tag
-			$field_type = unpack($type_short . 'type', substr($data, $offset + self::SHORT_SIZE, self::SHORT_SIZE));
+			$field_type = unpack($this->type_short . 'type', substr($data, $offset + self::SHORT_SIZE, self::SHORT_SIZE));
 
 			// Get IFD entry
 			$ifd_value = substr($data, $offset + 2 * self::LONG_SIZE, self::LONG_SIZE);
 
-			// Get actual dimensions from IFD
-			if ($type[1] === self::TIF_TAG_IMAGE_HEIGHT)
-			{
-				$size = array_merge($size, ($field_type['type'] === self::TIF_TAG_TYPE_SHORT) ? unpack($type_short . 'height', $ifd_value) : unpack($type_long . 'height', $ifd_value));
-			}
-			else if ($type[1] === self::TIF_TAG_IMAGE_WIDTH)
-			{
-				$size = array_merge($size, ($field_type['type'] === self::TIF_TAG_TYPE_SHORT) ? unpack($type_short .'width', $ifd_value) : unpack($type_long . 'width', $ifd_value));
-			}
+			// Set size of field
+			$this->setSizeInfo($type[1], $field_type['type'], $ifd_value);
 
 			$offset += self::TIF_IFD_ENTRY_SIZE;
 		}
 
-		$this->fastImageSize->set_size($size);
+		$this->fastImageSize->set_size($this->size);
+	}
+
+	/**
+	 * Set byte type based on signature in header
+	 *
+	 * @param string $signature Header signature
+	 */
+	protected function setByteType($signature)
+	{
+		if ($signature === "II")
+		{
+			$this->type_long = 'V';
+			$this->type_short = 'v';
+			$this->size['type'] = IMAGETYPE_TIFF_II;
+		}
+		else
+		{
+			$this->type_long = 'N';
+			$this->type_short = 'n';
+			$this->size['type'] = IMAGETYPE_TIFF_MM;
+		}
+	}
+
+	/**
+	 * Set size info
+	 *
+	 * @param int $dimension_type Type of dimension. Either width or height
+	 * @param int $field_length Length of field. Either short or long
+	 * @param string $ifd_value String value of IFD field
+	 */
+	protected function setSizeInfo($dimension_type, $field_length, $ifd_value)
+	{
+		// Set size of field
+		$field_size = $field_length === self::TIF_TAG_TYPE_SHORT ? $this->type_short : $this->type_long;
+
+		// Get actual dimensions from IFD
+		if ($dimension_type === self::TIF_TAG_IMAGE_HEIGHT)
+		{
+			$this->size = array_merge($this->size, unpack($field_size . 'height', $ifd_value));
+		}
+		else if ($dimension_type === self::TIF_TAG_IMAGE_WIDTH)
+		{
+			$this->size = array_merge($this->size, unpack($field_size . 'width', $ifd_value));
+		}
 	}
 }

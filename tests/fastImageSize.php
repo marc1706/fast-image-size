@@ -75,6 +75,8 @@ class fastImageSize extends \PHPUnit_Framework_TestCase
 			array('jpx', 'image/jpx', array('width' => 2, 'height' => 1, 'type' => IMAGETYPE_JPEG2000)),
 			array('jp2', '', array('width' => 2, 'height' => 1, 'type' => IMAGETYPE_JPEG2000)),
 			array('jpx', '', array('width' => 2, 'height' => 1, 'type' => IMAGETYPE_JPEG2000)),
+			array('meh', '', false),
+			array('meh', 'image/meh', false),
 		);
 	}
 

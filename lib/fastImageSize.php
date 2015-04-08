@@ -125,7 +125,7 @@ class fastImageSize
 	protected function get_imagesize_unknown_type($filename)
 	{
 		// Grab the maximum amount of bytes we might need
-		$data = $this->get_image($filename, 0, type\typeJpeg::JPG_MAX_HEADER_SIZE, false);
+		$data = $this->get_image($filename, 0, type\typeJpeg::JPEG_MAX_HEADER_SIZE, false);
 
 		if ($data !== false)
 		{

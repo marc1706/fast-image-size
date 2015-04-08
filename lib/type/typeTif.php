@@ -29,6 +29,12 @@ class typeTif extends typeBase
 	/** @var int TIF IFD entry size */
 	const TIF_IFD_ENTRY_SIZE = 12;
 
+	/** @var string TIF signature of intel type */
+	const TIF_SIGNATURE_INTEL = 'II';
+
+	/** @var string TIF signature of motorola type */
+	const TIF_SIGNATURE_MOTOROLA = 'MM';
+
 	/** @var array Size info array */
 	protected $size;
 
@@ -50,7 +56,7 @@ class typeTif extends typeBase
 
 		$signature = substr($data, 0, self::SHORT_SIZE);
 
-		if ($signature !== "II" && $signature !== "MM")
+		if (!in_array($signature, array(self::TIF_SIGNATURE_INTEL, self::TIF_SIGNATURE_MOTOROLA)))
 		{
 			return;
 		}
@@ -95,7 +101,7 @@ class typeTif extends typeBase
 	 */
 	protected function setByteType($signature)
 	{
-		if ($signature === "II")
+		if ($signature === self::TIF_SIGNATURE_INTEL)
 		{
 			$this->type_long = 'V';
 			$this->type_short = 'v';

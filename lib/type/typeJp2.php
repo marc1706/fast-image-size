@@ -16,6 +16,12 @@ class typeJp2 extends typeBase
 	/** @var string JPEG 2000 signature */
 	const JPEG_2000_SIGNATURE = "\x00\x00\x00\x0C\x6A\x50\x20\x20\x0D\x0A\x87\x0A";
 
+	/** @var string JPEG 2000 SOC marker */
+	const JPEG_2000_SOC_MARKER = "\xFF\x4F";
+
+	/** @var string JPEG 2000 SIZ marker */
+	const JPEG_2000_SIZ_MARKER = "\xFF\x51";
+
 	/**
 	 * {@inheritdoc}
 	 */
@@ -29,16 +35,12 @@ class typeJp2 extends typeBase
 			return;
 		}
 
-		// Get SOC position before starting to search for SIZ
-		$soc_position = strpos($data, "\xFF\x4F");
-
-		// Make sure we do not get SIZ before SOC
-		$data = substr($data, $soc_position);
-
-		$siz_position = strpos($data, "\xFF\x51");
+		// Get SOC position before starting to search for SIZ.
+		// Make sure we do not get SIZ before SOC by cutting at SOC.
+		$data = substr($data, strpos($data, self::JPEG_2000_SOC_MARKER));
 
 		// Remove SIZ and everything before
-		$data = substr($data, $siz_position + self::SHORT_SIZE);
+		$data = substr($data, strpos($data, self::JPEG_2000_SIZ_MARKER) + self::SHORT_SIZE);
 
 		// Acquire size info from data
 		$size = unpack('Nwidth/Nheight', substr($data, self::LONG_SIZE, self::LONG_SIZE * 2));

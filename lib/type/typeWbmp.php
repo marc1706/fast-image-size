@@ -21,7 +21,7 @@ class typeWbmp extends typeBase
 		$data = $this->fastImageSize->get_image($filename, 0, self::LONG_SIZE);
 
 		// Check if image is WBMP
-		if (!$this->validWBMP($data))
+		if ($data === false || !$this->validWBMP($data))
 		{
 			return;
 		}
@@ -42,7 +42,7 @@ class typeWbmp extends typeBase
 	/**
 	 * Return if supplied data might be part of a valid WBMP file
 	 *
-	 * @param string $data
+	 * @param bool|string $data
 	 *
 	 * @return bool True if data might be part of a valid WBMP file, else false
 	 */

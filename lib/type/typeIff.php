@@ -73,7 +73,7 @@ class typeIff extends typeBase
 	/**
 	 * Get IFF signature from data string
 	 *
-	 * @param string $data Image data string
+	 * @param string|bool $data Image data string
 	 *
 	 * @return false|string Signature if file is a valid IFF file, false if not
 	 */

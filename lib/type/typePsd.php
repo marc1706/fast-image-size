@@ -39,7 +39,7 @@ class typePsd extends typeBase
 		$version = unpack('n', substr($data, self::LONG_SIZE, 2));
 
 		// Check if supplied file is a PSD file
-		if (substr($data, 0, self::LONG_SIZE) !== self::PSD_SIGNATURE || $version[1] !== 1)
+		if (!$this->validPsd($data, $version))
 		{
 			return;
 		}
@@ -48,5 +48,18 @@ class typePsd extends typeBase
 
 		$this->fastImageSize->set_size($size);
 		$this->fastImageSize->set_image_type(IMAGETYPE_PSD);
+	}
+
+	/**
+	 * Return whether file is a valid PSD file
+	 *
+	 * @param string $data Image data string
+	 * @param array $version Version array
+	 *
+	 * @return bool True if image is a valid PSD file, false if not
+	 */
+	protected function validPsd($data, $version)
+	{
+		return substr($data, 0, self::LONG_SIZE) === self::PSD_SIGNATURE && $version[1] === 1;
 	}
 }

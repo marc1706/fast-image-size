@@ -82,6 +82,7 @@ class fastImageSize extends \PHPUnit_Framework_TestCase
 			array('ico', 'image/ico', array('width' => 2, 'height' => 1, 'type' => IMAGETYPE_ICO)),
 			array('ico', 'image/vnd.microsoft.icon', array('width' => 2, 'height' => 1, 'type' => IMAGETYPE_ICO)),
 			array('ico', '', array('width' => 2, 'height' => 1, 'type' => IMAGETYPE_ICO)),
+			array('foobar', 'image/x-icon', false),
 			array('png', 'image/icon', false),
 			array('meh', '', false),
 			array('meh', 'image/meh', false),

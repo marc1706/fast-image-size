@@ -27,10 +27,14 @@ class typeIco extends typeBase
 		// Retrieve image data for ICO header and header of first entry.
 		// We assume the first entry to have the same size as the other ones.
 		$data = $this->fastImageSize->get_image($filename, 0, 2 * self::LONG_SIZE);
-		$header = unpack('vreserved/vtype/vimages', $data);
+
+		if ($data === false)
+		{
+			return;
+		}
 
 		// Check if header fits expected format
-		if ($header['reserved'] !== self::ICO_RESERVED || $header['type'] !== self::ICO_TYPE || $header['images'] < 1 || $header['images'] > 255)
+		if (!$this->isValidIco($data))
 		{
 			return;
 		}
@@ -39,5 +43,20 @@ class typeIco extends typeBase
 
 		$this->fastImageSize->set_size($size);
 		$this->fastImageSize->set_image_type(IMAGETYPE_ICO);
+	}
+
+	/**
+	 * Return whether image is a valid ICO file
+	 *
+	 * @param string $data Image data string
+	 *
+	 * @return bool True if file is a valid ICO file, false if not
+	 */
+	protected function isValidIco($data)
+	{
+		// Get header
+		$header = unpack('vreserved/vtype/vimages', $data);
+
+		return $header['reserved'] === self::ICO_RESERVED && $header['type'] === self::ICO_TYPE && $header['images'] > 0 && $header['images'] <= 255;
 	}
 }

@@ -211,4 +211,14 @@ class fastImageSize
 
 		return empty($this->data) ? false : $this->data;
 	}
+
+	/**
+	 * Get return data
+	 *
+	 * @return array|bool Size array if dimensions could be found, false if not
+	 */
+	protected function getReturnData()
+	{
+		return sizeof($this->size) > 1 ? $this->size : false;
+	}
 }

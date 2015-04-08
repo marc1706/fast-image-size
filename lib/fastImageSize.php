@@ -193,7 +193,7 @@ class fastImageSize
 	 * @param bool $force_length True if the length needs to be the specified
 	 *			length, false if not. Default: true
 	 *
-	 * @return bool|string Image data or false if result was empty
+	 * @return false|string Image data or false if result was empty
 	 */
 	public function get_image($filename, $offset, $length, $force_length = true)
 	{

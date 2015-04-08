@@ -75,7 +75,7 @@ class typeIff extends typeBase
 	 *
 	 * @param string $data Image data string
 	 *
-	 * @return bool|string Signature if file is a valid IFF file, false if not
+	 * @return false|string Signature if file is a valid IFF file, false if not
 	 */
 	protected function getIffSignature($data)
 	{

@@ -57,6 +57,12 @@ class fastImageSize
 				'iff',
 				'x-iff',
 		),
+		'ico'	=> array(
+				'ico',
+				'vnd.microsoft.icon',
+				'x-icon',
+				'icon',
+		),
 	);
 
 	/** @var array Class map that links image extensions/mime types to class */

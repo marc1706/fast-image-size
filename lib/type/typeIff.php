@@ -17,6 +17,33 @@ class typeIff extends typeBase
 	 * sure we have the necessary data */
 	const IFF_HEADER_SIZE = 32;
 
+	/** @var string IFF header for Amiga type */
+	const IFF_HEADER_AMIGA = 'FORM';
+
+	/** @var string IFF header for Maya type */
+	const IFF_HEADER_MAYA = 'FOR4';
+
+	/** @var string IFF BTMHD for Amiga type */
+	const IFF_AMIGA_BTMHD = 'BMHD';
+
+	/** @var string IFF BTMHD for Maya type */
+	const IFF_MAYA_BTMHD = 'BHD';
+
+	/** @var string PHP pack format for unsigned short */
+	const PACK_UNSIGNED_SHORT = 'n';
+
+	/** @var string PHP pack format for unsigned long */
+	const PACK_UNSIGNED_LONG = 'N';
+
+	/** @var string BTMHD of current image */
+	protected $btmhd;
+
+	/** @var int Size of current BTMHD */
+	protected $btmhdSize;
+
+	/** @var string Current byte type */
+	protected $byteType;
+
 	/**
 	 * {@inheritdoc}
 	 */
@@ -24,28 +51,67 @@ class typeIff extends typeBase
 	{
 		$data = $this->fastImageSize->get_image($filename, 0, self::IFF_HEADER_SIZE);
 
-		$signature = substr($data, 0, self::LONG_SIZE );
+		$signature = $this->getIffSignature($data);
 
 		// Check if image is IFF
-		if ($signature !== 'FORM' && $signature !== 'FOR4')
+		if ($signature === false)
 		{
 			return;
 		}
 
+		// Set type constraints
+		$this->setTypeConstraints($signature);
+
+		// Get size from data
+		$btmhd_position = strpos($data, $this->btmhd);
+		$size = unpack("{$this->byteType}width/{$this->byteType}height", substr($data, $btmhd_position + self::LONG_SIZE + strlen($this->btmhd), $this->btmhdSize));
+
+		$this->fastImageSize->set_size($size);
+		$this->fastImageSize->set_image_type(IMAGETYPE_IFF);
+	}
+
+	/**
+	 * Get IFF signature from data string
+	 *
+	 * @param string $data Image data string
+	 *
+	 * @return bool|string Signature if file is a valid IFF file, false if not
+	 */
+	protected function getIffSignature($data)
+	{
+		$signature = substr($data, 0, self::LONG_SIZE);
+
+		// Check if image is IFF
+		if ($signature !== self::IFF_HEADER_AMIGA && $signature !== self::IFF_HEADER_MAYA)
+		{
+			return false;
+		}
+		else
+		{
+			return $signature;
+		}
+	}
+
+	/**
+	 * Set type constraints for current image
+	 *
+	 * @param string $signature IFF signature of image
+	 */
+	protected function setTypeConstraints($signature)
+	{
 		// Amiga version of IFF
 		if ($signature === 'FORM')
 		{
-			$btmhd_position = strpos($data, 'BMHD');
-			$size = unpack('nwidth/nheight', substr($data, $btmhd_position + 2 * self::LONG_SIZE, self::LONG_SIZE));
+			$this->btmhd = self::IFF_AMIGA_BTMHD;
+			$this->btmhdSize = self::LONG_SIZE;
+			$this->byteType = self::PACK_UNSIGNED_SHORT;
 		}
 		// Maya version
 		else
 		{
-			$btmhd_position = strpos($data, 'BHD');
-			$size = unpack('Nwidth/Nheight', substr($data, $btmhd_position + 2 * self::LONG_SIZE - 1, self::LONG_SIZE * 2));
+			$this->btmhd = self::IFF_MAYA_BTMHD;
+			$this->btmhdSize = self::LONG_SIZE * 2;
+			$this->byteType = self::PACK_UNSIGNED_LONG;
 		}
-
-		$this->fastImageSize->set_size($size);
-		$this->fastImageSize->set_image_type(IMAGETYPE_IFF);
 	}
 }

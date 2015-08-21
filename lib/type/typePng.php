@@ -26,7 +26,7 @@ class typePng extends typeBase
 	{
 		// Retrieve image data including the header, the IHDR tag, and the
 		// following 2 chunks for the image width and height
-		$data = $this->fastImageSize->get_image($filename, 0, self::PNG_IHDR_OFFSET + 3 * self::LONG_SIZE);
+		$data = $this->fastImageSize->getImage($filename, 0, self::PNG_IHDR_OFFSET + 3 * self::LONG_SIZE);
 
 		// Check if header fits expected format specified by RFC 2083
 		if (substr($data, 0, self::PNG_IHDR_OFFSET - self::LONG_SIZE) !== self::PNG_HEADER || substr($data, self::PNG_IHDR_OFFSET, self::LONG_SIZE) !== 'IHDR')
@@ -36,7 +36,7 @@ class typePng extends typeBase
 
 		$size = unpack('Nwidth/Nheight', substr($data, self::PNG_IHDR_OFFSET + self::LONG_SIZE, self::LONG_SIZE * 2));
 
-		$this->fastImageSize->set_size($size);
+		$this->fastImageSize->setSize($size);
 		$this->fastImageSize->set_image_type(IMAGETYPE_PNG);
 	}
 }

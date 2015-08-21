@@ -100,7 +100,7 @@ class fastImageSize
 	public function getImageSize($file, $type = '')
 	{
 		// Reset values
-		$this->reset_values();
+		$this->resetValues();
 
 		// Treat image type as unknown if extension or mime type is unknown
 		if (!preg_match('/\.([a-z0-9]+)$/i', $file, $match) && empty($type))
@@ -125,7 +125,7 @@ class fastImageSize
 	protected function get_imagesize_unknown_type($filename)
 	{
 		// Grab the maximum amount of bytes we might need
-		$data = $this->get_image($filename, 0, type\typeJpeg::JPEG_MAX_HEADER_SIZE, false);
+		$data = $this->getImage($filename, 0, type\typeJpeg::JPEG_MAX_HEADER_SIZE, false);
 
 		if ($data !== false)
 		{
@@ -158,7 +158,7 @@ class fastImageSize
 	/**
 	 * Reset values to default
 	 */
-	protected function reset_values()
+	protected function resetValues()
 	{
 		$this->size = array();
 		$this->data = '';
@@ -179,7 +179,7 @@ class fastImageSize
 	 *
 	 * @param array $size Array containing size info for image
 	 */
-	public function set_size($size)
+	public function setSize($size)
 	{
 		$this->size = $size;
 	}
@@ -195,7 +195,7 @@ class fastImageSize
 	 *
 	 * @return false|string Image data or false if result was empty
 	 */
-	public function get_image($filename, $offset, $length, $forceLength = true)
+	public function getImage($filename, $offset, $length, $forceLength = true)
 	{
 		if (empty($this->data))
 		{

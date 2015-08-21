@@ -50,7 +50,7 @@ class typeTif extends typeBase
 	public function getSize($filename)
 	{
 		// Do not force length of header
-		$data = $this->fastImageSize->get_image($filename, 0, self::TIF_HEADER_SIZE, false);
+		$data = $this->fastImageSize->getImage($filename, 0, self::TIF_HEADER_SIZE, false);
 
 		$this->size = array();
 
@@ -91,7 +91,7 @@ class typeTif extends typeBase
 			$offset += self::TIF_IFD_ENTRY_SIZE;
 		}
 
-		$this->fastImageSize->set_size($this->size);
+		$this->fastImageSize->setSize($this->size);
 	}
 
 	/**

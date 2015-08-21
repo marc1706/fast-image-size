@@ -33,17 +33,17 @@ Just add the following snippet to your composer.json:
 
 ### Usage
 
-Using the fastImageSize library is rather straightforward. Just create a new instance of the main class:
+Using the fast-image-size library is rather straightforward. Just create a new instance of the main class:
 ```
-$fastImageSize = new \fastImageSize\fastImageSize();
+$FastImageSize = new \FastImageSize\FastImageSize();
 ```
 
 Afterwards, you can check images using the getImageSize() method:
 ```
-$imageSize = $fastImageSize->getImageSize('https://example.com/some_random_image.jpg');
+$imageSize = $FastImageSize->getImageSize('https://example.com/some_random_image.jpg');
 ```
 
-You can pass any local or remote images to this library as long as it's readable.
+You can pass any local or remote image to this library as long as it's readable.
 
 If the library is able to determine the image size, it will return an array with the following structure (values and type might of course differ depending on your image):
 ```

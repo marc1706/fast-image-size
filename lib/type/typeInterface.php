@@ -9,9 +9,9 @@
  * file that was distributed with this source code.
  */
 
-namespace fastImageSize\type;
+namespace FastImageSize\Type;
 
-interface typeInterface
+interface TypeInterface
 {
 	/** @var int 4-byte long size */
 	const LONG_SIZE = 4;

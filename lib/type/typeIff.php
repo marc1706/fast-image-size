@@ -9,9 +9,9 @@
  * file that was distributed with this source code.
  */
 
-namespace fastImageSize\type;
+namespace FastImageSize\Type;
 
-class typeIff extends typeBase
+class TypeIff extends TypeBase
 {
 	/** @var int IFF header size. Grab more than what should be needed to make
 	 * sure we have the necessary data */
@@ -67,7 +67,7 @@ class typeIff extends typeBase
 		$size = unpack("{$this->byteType}width/{$this->byteType}height", substr($data, $btmhdPosition + self::LONG_SIZE + strlen($this->btmhd), $this->btmhdSize));
 
 		$this->fastImageSize->setSize($size);
-		$this->fastImageSize->set_image_type(IMAGETYPE_IFF);
+		$this->fastImageSize->setImageType(IMAGETYPE_IFF);
 	}
 
 	/**

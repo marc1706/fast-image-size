@@ -9,9 +9,9 @@
  * file that was distributed with this source code.
  */
 
-namespace fastImageSize\type;
+namespace FastImageSize\Type;
 
-class typeJp2 extends typeBase
+class TypeJp2 extends TypeBase
 {
 	/** @var string JPEG 2000 signature */
 	const JPEG_2000_SIGNATURE = "\x00\x00\x00\x0C\x6A\x50\x20\x20\x0D\x0A\x87\x0A";
@@ -27,7 +27,7 @@ class typeJp2 extends typeBase
 	 */
 	public function getSize($filename)
 	{
-		$data = $this->fastImageSize->getImage($filename, 0, typeJpeg::JPEG_MAX_HEADER_SIZE, false);
+		$data = $this->fastImageSize->getImage($filename, 0, TypeJpeg::JPEG_MAX_HEADER_SIZE, false);
 
 		// Check if file is jpeg 2000
 		if (substr($data, 0, strlen(self::JPEG_2000_SIGNATURE)) !== self::JPEG_2000_SIGNATURE)
@@ -46,6 +46,6 @@ class typeJp2 extends typeBase
 		$size = unpack('Nwidth/Nheight', substr($data, self::LONG_SIZE, self::LONG_SIZE * 2));
 
 		$this->fastImageSize->setSize($size);
-		$this->fastImageSize->set_image_type(IMAGETYPE_JPEG2000);
+		$this->fastImageSize->setImageType(IMAGETYPE_JPEG2000);
 	}
 }

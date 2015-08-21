@@ -9,21 +9,21 @@
  * file that was distributed with this source code.
  */
 
-namespace fastImageSize\type;
+namespace FastImageSize\Type;
 
-use \fastImageSize\fastImageSize;
+use \FastImageSize\FastImageSize;
 
-abstract class typeBase implements typeInterface
+abstract class TypeBase implements TypeInterface
 {
-	/** @var fastImageSize */
+	/** @var FastImageSize */
 	protected $fastImageSize;
 
 	/**
 	 * Base constructor for image types
 	 *
-	 * @param fastImageSize $fastImageSize
+	 * @param FastImageSize $fastImageSize
 	 */
-	public function __construct(fastImageSize $fastImageSize)
+	public function __construct(FastImageSize $fastImageSize)
 	{
 		$this->fastImageSize = $fastImageSize;
 	}

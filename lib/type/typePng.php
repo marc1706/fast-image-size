@@ -9,9 +9,9 @@
  * file that was distributed with this source code.
  */
 
-namespace fastImageSize\type;
+namespace FastImageSize\Type;
 
-class typePng extends typeBase
+class TypePng extends TypeBase
 {
 	/** @var string PNG header */
 	const PNG_HEADER = "\x89\x50\x4e\x47\x0d\x0a\x1a\x0a";
@@ -37,6 +37,6 @@ class typePng extends typeBase
 		$size = unpack('Nwidth/Nheight', substr($data, self::PNG_IHDR_OFFSET + self::LONG_SIZE, self::LONG_SIZE * 2));
 
 		$this->fastImageSize->setSize($size);
-		$this->fastImageSize->set_image_type(IMAGETYPE_PNG);
+		$this->fastImageSize->setImageType(IMAGETYPE_PNG);
 	}
 }

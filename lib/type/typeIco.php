@@ -9,9 +9,9 @@
  * file that was distributed with this source code.
  */
 
-namespace fastImageSize\type;
+namespace FastImageSize\Type;
 
-class typeIco extends typeBase
+class TypeIco extends TypeBase
 {
 	/** @var string ICO reserved field */
 	const ICO_RESERVED = 0;
@@ -42,7 +42,7 @@ class typeIco extends typeBase
 		$size = unpack('Cwidth/Cheight', substr($data, self::LONG_SIZE + self::SHORT_SIZE, self::SHORT_SIZE));
 
 		$this->fastImageSize->setSize($size);
-		$this->fastImageSize->set_image_type(IMAGETYPE_ICO);
+		$this->fastImageSize->setImageType(IMAGETYPE_ICO);
 	}
 
 	/**

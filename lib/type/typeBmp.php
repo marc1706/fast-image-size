@@ -9,9 +9,9 @@
  * file that was distributed with this source code.
  */
 
-namespace fastImageSize\type;
+namespace FastImageSize\Type;
 
-class typeBmp extends typeBase
+class TypeBmp extends TypeBase
 {
 	/** @var int BMP header size needed for retrieving dimensions */
 	const BMP_HEADER_SIZE = 26;
@@ -38,6 +38,6 @@ class typeBmp extends typeBase
 		$size = unpack('lwidth/lheight', substr($data, self::BMP_DIMENSIONS_OFFSET, 2 * self::LONG_SIZE));
 
 		$this->fastImageSize->setSize($size);
-		$this->fastImageSize->set_image_type(IMAGETYPE_BMP);
+		$this->fastImageSize->setImageType(IMAGETYPE_BMP);
 	}
 }

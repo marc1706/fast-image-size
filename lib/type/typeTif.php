@@ -9,9 +9,9 @@
  * file that was distributed with this source code.
  */
 
-namespace fastImageSize\type;
+namespace FastImageSize\Type;
 
-class typeTif extends typeBase
+class TypeTif extends TypeBase
 {
 	/** @var int TIF header size. The header might be larger but the dimensions
 	 *			should be in the first 512 bytes */

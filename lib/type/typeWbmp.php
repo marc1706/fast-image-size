@@ -9,9 +9,9 @@
  * file that was distributed with this source code.
  */
 
-namespace fastImageSize\type;
+namespace FastImageSize\Type;
 
-class typeWbmp extends typeBase
+class TypeWbmp extends TypeBase
 {
 	/**
 	 * {@inheritdoc}
@@ -36,7 +36,7 @@ class typeWbmp extends typeBase
 		}
 
 		$this->fastImageSize->setSize($size);
-		$this->fastImageSize->set_image_type(IMAGETYPE_WBMP);
+		$this->fastImageSize->setImageType(IMAGETYPE_WBMP);
 	}
 
 	/**
@@ -48,7 +48,7 @@ class typeWbmp extends typeBase
 	 */
 	protected function validWBMP($data)
 	{
-		return ord($data[0]) === 0 && ord($data[1]) === 0 && $data !== substr(typeJp2::JPEG_2000_SIGNATURE, 0, self::LONG_SIZE);
+		return ord($data[0]) === 0 && ord($data[1]) === 0 && $data !== substr(TypeJp2::JPEG_2000_SIGNATURE, 0, self::LONG_SIZE);
 	}
 
 	/**

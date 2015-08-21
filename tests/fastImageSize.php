@@ -9,13 +9,13 @@
  * file that was distributed with this source code.
  */
 
-namespace fastImageSize\tests;
+namespace FastImageSize\Tests;
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
-class fastImageSize extends \PHPUnit_Framework_TestCase
+class FastImageSize extends \PHPUnit_Framework_TestCase
 {
-	/** @var \fastImageSize\fastImageSize */
+	/** @var \FastImageSize\FastImageSize */
 	protected $imageSize;
 
 	/** @var string Path to fixtures */
@@ -24,7 +24,7 @@ class fastImageSize extends \PHPUnit_Framework_TestCase
 	public function setUp()
 	{
 		parent::setUp();
-		$this->imageSize = new \fastImageSize\fastImageSize();
+		$this->imageSize = new \FastImageSize\FastImageSize();
 		$this->path = __DIR__ . '/fixture/';
 	}
 

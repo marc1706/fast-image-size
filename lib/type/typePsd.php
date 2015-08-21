@@ -9,9 +9,9 @@
  * file that was distributed with this source code.
  */
 
-namespace fastImageSize\type;
+namespace FastImageSize\Type;
 
-class typePsd extends typeBase
+class TypePsd extends TypeBase
 {
 	/** @var string PSD signature */
 	const PSD_SIGNATURE = "8BPS";
@@ -47,7 +47,7 @@ class typePsd extends typeBase
 		$size = unpack('Nheight/Nwidth', substr($data, self::PSD_DIMENSIONS_OFFSET, 2 * self::LONG_SIZE));
 
 		$this->fastImageSize->setSize($size);
-		$this->fastImageSize->set_image_type(IMAGETYPE_PSD);
+		$this->fastImageSize->setImageType(IMAGETYPE_PSD);
 	}
 
 	/**

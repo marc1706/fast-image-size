@@ -9,9 +9,9 @@
  * file that was distributed with this source code.
  */
 
-namespace fastImageSize\type;
+namespace FastImageSize\Type;
 
-class typeGif extends typeBase
+class TypeGif extends TypeBase
 {
 	/** @var string GIF87a header */
 	const GIF87A_HEADER = "\x47\x49\x46\x38\x37\x61";
@@ -40,6 +40,6 @@ class typeGif extends typeBase
 		$size = unpack('vwidth/vheight', substr($data, self::GIF_HEADER_SIZE, self::SHORT_SIZE * 2));
 
 		$this->fastImageSize->setSize($size);
-		$this->fastImageSize->set_image_type(IMAGETYPE_GIF);
+		$this->fastImageSize->setImageType(IMAGETYPE_GIF);
 	}
 }

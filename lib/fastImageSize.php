@@ -9,9 +9,9 @@
  * file that was distributed with this source code.
  */
 
-namespace fastImageSize;
+namespace FastImageSize;
 
-class fastImageSize
+class FastImageSize
 {
 	/** @var array Size info that is returned */
 	protected $size = array();
@@ -78,13 +78,13 @@ class fastImageSize
 	{
 		foreach ($this->supportedTypes as $imageType => $extension)
 		{
-			$className = '\fastImageSize\type\type' . ucfirst(strtolower($imageType));
+			$className = '\FastImageSize\Type\Type' . ucfirst(strtolower($imageType));
 			$this->type[$imageType] = new $className($this);
 
 			// Create class map
 			foreach ($extension as $ext)
 			{
-				/** @var type\typeInterface */
+				/** @var Type\TypeInterface */
 				$this->classMap[$ext] = $this->type[$imageType];
 			}
 		}
@@ -105,7 +105,7 @@ class fastImageSize
 		// Treat image type as unknown if extension or mime type is unknown
 		if (!preg_match('/\.([a-z0-9]+)$/i', $file, $match) && empty($type))
 		{
-			$this->get_imagesize_unknown_type($file);
+			$this->getImagesizeUnknownType($file);
 		}
 		else
 		{
@@ -122,10 +122,10 @@ class fastImageSize
 	 *
 	 * @param string $filename Path to file
 	 */
-	protected function get_imagesize_unknown_type($filename)
+	protected function getImagesizeUnknownType($filename)
 	{
 		// Grab the maximum amount of bytes we might need
-		$data = $this->getImage($filename, 0, type\typeJpeg::JPEG_MAX_HEADER_SIZE, false);
+		$data = $this->getImage($filename, 0, Type\TypeJpeg::JPEG_MAX_HEADER_SIZE, false);
 
 		if ($data !== false)
 		{
@@ -169,7 +169,7 @@ class fastImageSize
 	 *
 	 * @param int $type Type of image
 	 */
-	public function set_image_type($type)
+	public function setImageType($type)
 	{
 		$this->size['type'] = $type;
 	}

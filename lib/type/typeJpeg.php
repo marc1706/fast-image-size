@@ -9,9 +9,9 @@
  * file that was distributed with this source code.
  */
 
-namespace fastImageSize\type;
+namespace FastImageSize\Type;
 
-class typeJpeg extends typeBase
+class TypeJpeg extends TypeBase
 {
 	/** @var int JPEG max header size. Headers can be bigger, but we'll abort
 	 *			going throught he header after this */
@@ -59,7 +59,7 @@ class typeJpeg extends typeBase
 		$size = $this->getSizeInfo($data);
 
 		$this->fastImageSize->setSize($size);
-		$this->fastImageSize->set_image_type(IMAGETYPE_JPEG);
+		$this->fastImageSize->setImageType(IMAGETYPE_JPEG);
 	}
 
 	/**

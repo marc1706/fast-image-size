@@ -20,7 +20,7 @@ class fastImageSize
 	protected $data = '';
 
 	/** @var array List of supported image types and associated image types */
-	protected $supported_types = array(
+	protected $supportedTypes = array(
 		'png'	=> array('png'),
 		'gif'	=> array('gif'),
 		'jpeg'	=> array(
@@ -66,7 +66,7 @@ class fastImageSize
 	);
 
 	/** @var array Class map that links image extensions/mime types to class */
-	protected $class_map;
+	protected $classMap;
 
 	/** @var array An array containing the classes of supported image types */
 	protected $type;
@@ -76,16 +76,16 @@ class fastImageSize
 	 */
 	public function __construct()
 	{
-		foreach ($this->supported_types as $image_type => $extension)
+		foreach ($this->supportedTypes as $imageType => $extension)
 		{
-			$class_name = '\fastImageSize\type\type' . ucfirst(strtolower($image_type));
-			$this->type[$image_type] = new $class_name($this);
+			$className = '\fastImageSize\type\type' . ucfirst(strtolower($imageType));
+			$this->type[$imageType] = new $className($this);
 
 			// Create class map
 			foreach ($extension as $ext)
 			{
 				/** @var type\typeInterface */
-				$this->class_map[$ext] = $this->type[$image_type];
+				$this->classMap[$ext] = $this->type[$imageType];
 			}
 		}
 	}
@@ -100,7 +100,7 @@ class fastImageSize
 	public function getImageSize($file, $type = '')
 	{
 		// Reset values
-		$this->reset_values();
+		$this->resetValues();
 
 		// Treat image type as unknown if extension or mime type is unknown
 		if (!preg_match('/\.([a-z0-9]+)$/i', $file, $match) && empty($type))
@@ -125,13 +125,13 @@ class fastImageSize
 	protected function get_imagesize_unknown_type($filename)
 	{
 		// Grab the maximum amount of bytes we might need
-		$data = $this->get_image($filename, 0, type\typeJpeg::JPEG_MAX_HEADER_SIZE, false);
+		$data = $this->getImage($filename, 0, type\typeJpeg::JPEG_MAX_HEADER_SIZE, false);
 
 		if ($data !== false)
 		{
-			foreach ($this->type as $image_type)
+			foreach ($this->type as $imageType)
 			{
-				$image_type->getSize($filename);
+				$imageType->getSize($filename);
 
 				if (sizeof($this->size) > 1)
 				{
@@ -149,16 +149,16 @@ class fastImageSize
 	 */
 	protected function getImageSizeByExtension($file, $extension)
 	{
-		if (isset($this->class_map[$extension]))
+		if (isset($this->classMap[$extension]))
 		{
-			$this->class_map[$extension]->getSize($file);
+			$this->classMap[$extension]->getSize($file);
 		}
 	}
 
 	/**
 	 * Reset values to default
 	 */
-	protected function reset_values()
+	protected function resetValues()
 	{
 		$this->size = array();
 		$this->data = '';
@@ -179,7 +179,7 @@ class fastImageSize
 	 *
 	 * @param array $size Array containing size info for image
 	 */
-	public function set_size($size)
+	public function setSize($size)
 	{
 		$this->size = $size;
 	}
@@ -190,12 +190,12 @@ class fastImageSize
 	 * @param string $filename Path to image
 	 * @param int $offset Offset at which reading of the image should start
 	 * @param int $length Maximum length that should be read
-	 * @param bool $force_length True if the length needs to be the specified
+	 * @param bool $forceLength True if the length needs to be the specified
 	 *			length, false if not. Default: true
 	 *
 	 * @return false|string Image data or false if result was empty
 	 */
-	public function get_image($filename, $offset, $length, $force_length = true)
+	public function getImage($filename, $offset, $length, $forceLength = true)
 	{
 		if (empty($this->data))
 		{
@@ -204,7 +204,7 @@ class fastImageSize
 
 		// Force length to expected one. Return false if data length
 		// is smaller than expected length
-		if ($force_length === true)
+		if ($forceLength === true)
 		{
 			return (strlen($this->data) < $length) ? false : substr($this->data, $offset, $length) ;
 		}

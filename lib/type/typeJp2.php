@@ -27,7 +27,7 @@ class typeJp2 extends typeBase
 	 */
 	public function getSize($filename)
 	{
-		$data = $this->fastImageSize->get_image($filename, 0, typeJpeg::JPEG_MAX_HEADER_SIZE, false);
+		$data = $this->fastImageSize->getImage($filename, 0, typeJpeg::JPEG_MAX_HEADER_SIZE, false);
 
 		// Check if file is jpeg 2000
 		if (substr($data, 0, strlen(self::JPEG_2000_SIGNATURE)) !== self::JPEG_2000_SIGNATURE)
@@ -45,7 +45,7 @@ class typeJp2 extends typeBase
 		// Acquire size info from data
 		$size = unpack('Nwidth/Nheight', substr($data, self::LONG_SIZE, self::LONG_SIZE * 2));
 
-		$this->fastImageSize->set_size($size);
+		$this->fastImageSize->setSize($size);
 		$this->fastImageSize->set_image_type(IMAGETYPE_JPEG2000);
 	}
 }

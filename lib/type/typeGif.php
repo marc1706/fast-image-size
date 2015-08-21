@@ -29,7 +29,7 @@ class typeGif extends typeBase
 	{
 		// Get data needed for reading image dimensions as outlined by GIF87a
 		// and GIF89a specifications
-		$data = $this->fastImageSize->get_image($filename, 0, self::GIF_HEADER_SIZE + self::SHORT_SIZE * 2);
+		$data = $this->fastImageSize->getImage($filename, 0, self::GIF_HEADER_SIZE + self::SHORT_SIZE * 2);
 
 		$type = substr($data, 0, self::GIF_HEADER_SIZE);
 		if ($type !== self::GIF87A_HEADER && $type !== self::GIF89A_HEADER)
@@ -39,7 +39,7 @@ class typeGif extends typeBase
 
 		$size = unpack('vwidth/vheight', substr($data, self::GIF_HEADER_SIZE, self::SHORT_SIZE * 2));
 
-		$this->fastImageSize->set_size($size);
+		$this->fastImageSize->setSize($size);
 		$this->fastImageSize->set_image_type(IMAGETYPE_GIF);
 	}
 }

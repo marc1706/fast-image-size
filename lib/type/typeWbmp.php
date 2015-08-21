@@ -18,7 +18,7 @@ class typeWbmp extends typeBase
 	 */
 	public function getSize($filename)
 	{
-		$data = $this->fastImageSize->get_image($filename, 0, self::LONG_SIZE);
+		$data = $this->fastImageSize->getImage($filename, 0, self::LONG_SIZE);
 
 		// Check if image is WBMP
 		if ($data === false || !$this->validWBMP($data))
@@ -35,7 +35,7 @@ class typeWbmp extends typeBase
 			return;
 		}
 
-		$this->fastImageSize->set_size($size);
+		$this->fastImageSize->setSize($size);
 		$this->fastImageSize->set_image_type(IMAGETYPE_WBMP);
 	}
 

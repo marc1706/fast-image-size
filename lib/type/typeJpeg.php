@@ -47,7 +47,7 @@ class typeJpeg extends typeBase
 	public function getSize($filename)
 	{
 		// Do not force the data length
-		$data = $this->fastImageSize->get_image($filename, 0, self::JPEG_MAX_HEADER_SIZE, false);
+		$data = $this->fastImageSize->getImage($filename, 0, self::JPEG_MAX_HEADER_SIZE, false);
 
 		// Check if file is jpeg
 		if (substr($data, 0, self::SHORT_SIZE) !== self::JPEG_HEADER || $data === false)
@@ -58,7 +58,7 @@ class typeJpeg extends typeBase
 		// Look through file for SOF marker
 		$size = $this->getSizeInfo($data);
 
-		$this->fastImageSize->set_size($size);
+		$this->fastImageSize->setSize($size);
 		$this->fastImageSize->set_image_type(IMAGETYPE_JPEG);
 	}
 

@@ -27,7 +27,7 @@ class typePsd extends typeBase
 	 */
 	public function getSize($filename)
 	{
-		$data = $this->fastImageSize->get_image($filename, 0, self::PSD_HEADER_SIZE);
+		$data = $this->fastImageSize->getImage($filename, 0, self::PSD_HEADER_SIZE);
 
 		if ($data === false)
 		{
@@ -46,7 +46,7 @@ class typePsd extends typeBase
 
 		$size = unpack('Nheight/Nwidth', substr($data, self::PSD_DIMENSIONS_OFFSET, 2 * self::LONG_SIZE));
 
-		$this->fastImageSize->set_size($size);
+		$this->fastImageSize->setSize($size);
 		$this->fastImageSize->set_image_type(IMAGETYPE_PSD);
 	}
 

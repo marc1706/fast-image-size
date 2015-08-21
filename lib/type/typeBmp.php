@@ -27,7 +27,7 @@ class typeBmp extends typeBase
 	 */
 	public function getSize($filename)
 	{
-		$data = $this->fastImageSize->get_image($filename, 0, self::BMP_HEADER_SIZE);
+		$data = $this->fastImageSize->getImage($filename, 0, self::BMP_HEADER_SIZE);
 
 		// Check if supplied file is a BMP file
 		if (substr($data, 0, 2) !== self::BMP_SIGNATURE)
@@ -37,7 +37,7 @@ class typeBmp extends typeBase
 
 		$size = unpack('lwidth/lheight', substr($data, self::BMP_DIMENSIONS_OFFSET, 2 * self::LONG_SIZE));
 
-		$this->fastImageSize->set_size($size);
+		$this->fastImageSize->setSize($size);
 		$this->fastImageSize->set_image_type(IMAGETYPE_BMP);
 	}
 }

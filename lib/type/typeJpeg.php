@@ -86,9 +86,10 @@ class typeJpeg extends typeBase
 	protected function getSizeInfo($data)
 	{
 		$size = array();
+		$dataLength = strlen($data);
 
 		// Look through file for SOF marker
-		for ($i = 2 * self::SHORT_SIZE; $i < strlen($data); $i++)
+		for ($i = 2 * self::SHORT_SIZE; $i < $dataLength; $i++)
 		{
 			if ($this->isSofMarker($data[$i], $data[$i + 1]))
 			{

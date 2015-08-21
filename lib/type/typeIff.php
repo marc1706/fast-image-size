@@ -63,8 +63,8 @@ class typeIff extends typeBase
 		$this->setTypeConstraints($signature);
 
 		// Get size from data
-		$btmhd_position = strpos($data, $this->btmhd);
-		$size = unpack("{$this->byteType}width/{$this->byteType}height", substr($data, $btmhd_position + self::LONG_SIZE + strlen($this->btmhd), $this->btmhdSize));
+		$btmhdPosition = strpos($data, $this->btmhd);
+		$size = unpack("{$this->byteType}width/{$this->byteType}height", substr($data, $btmhdPosition + self::LONG_SIZE + strlen($this->btmhd), $this->btmhdSize));
 
 		$this->fastImageSize->set_size($size);
 		$this->fastImageSize->set_image_type(IMAGETYPE_IFF);

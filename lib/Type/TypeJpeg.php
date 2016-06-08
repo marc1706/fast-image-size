@@ -41,6 +41,17 @@ class TypeJpeg extends TypeBase
 		"\xCF"
 	);
 
+	/** @var array JPEG APP markers */
+	protected $appMarkers = array(
+		"\xE0",
+		"\xE1",
+		"\xE2",
+		"\xE3",
+		"\xEC",
+		"\xED",
+		"\xEE",
+	);
+
 	/**
 	 * {@inheritdoc}
 	 */
@@ -76,6 +87,18 @@ class TypeJpeg extends TypeBase
 	}
 
 	/**
+	 * Return if current data point is an APP marker
+	 *
+	 * @param string $firstByte First byte to check
+	 * @param string $secondByte Second byte to check
+	 * @return bool True if current data point is APP marker, false if not
+	 */
+	protected function isAppMarker($firstByte, $secondByte)
+	{
+		return $firstByte === self::SOF_START_MARKER && in_array($secondByte, $this->appMarkers);
+	}
+
+	/**
 	 * Get size info from image data
 	 *
 	 * @param string $data JPEG data stream
@@ -89,8 +112,19 @@ class TypeJpeg extends TypeBase
 		$dataLength = strlen($data);
 
 		// Look through file for SOF marker
-		for ($i = 2 * self::SHORT_SIZE; $i < $dataLength; $i++)
+		for ($i = 0; $i < $dataLength; $i++)
 		{
+			if ($this->isAppMarker($data[$i], $data[$i + 1]))
+			{
+				// Extract length from APP marker
+				list(, $unpacked) = unpack("H*", substr($data, $i + self::SHORT_SIZE, 2));
+
+				$length = hexdec(substr($unpacked, 0, 4));
+
+				// Skip over length of APP header
+				$i += (int) $length;
+			}
+
 			if ($this->isSofMarker($data[$i], $data[$i + 1]))
 			{
 				// Extract size info from SOF marker

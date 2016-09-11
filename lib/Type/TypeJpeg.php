@@ -15,7 +15,7 @@ class TypeJpeg extends TypeBase
 {
 	/** @var int JPEG max header size. Headers can be bigger, but we'll abort
 	 *			going throught he header after this */
-	const JPEG_MAX_HEADER_SIZE = 24576;
+	const JPEG_MAX_HEADER_SIZE = 122880;
 
 	/** @var string JPEG header */
 	const JPEG_HEADER = "\xFF\xD8";

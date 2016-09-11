@@ -200,6 +200,23 @@ class FastImageSize
 		if (empty($this->data))
 		{
 			$this->data = @file_get_contents($filename, null, null, $offset, $length);
+
+			if ($this->data === false) {
+
+				$headers = array(
+			    	'Range: bytes=0-' . ($length - 1)
+			    );
+
+			    $curl = curl_init($filename);
+			    curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
+			    curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+			    $this->data = curl_exec($curl);
+			    curl_close($curl);
+			    
+			    if (isset($offset)) {
+					$this->data = substr($this->data, $offset);
+				}
+			}
 		}
 
 		// Force length to expected one. Return false if data length

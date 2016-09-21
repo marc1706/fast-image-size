@@ -149,6 +149,7 @@ class FastImageSize
 	 */
 	protected function getImageSizeByExtension($file, $extension)
 	{
+		$extension = strtolower($extension);
 		if (isset($this->classMap[$extension]))
 		{
 			$this->classMap[$extension]->getSize($file);

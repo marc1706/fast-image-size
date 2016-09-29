@@ -109,7 +109,8 @@ class TypeJpeg extends TypeBase
 	protected function getSizeInfo($data)
 	{
 		$size = array();
-		$dataLength = strlen($data);
+		// since we check $i + 1 we need to stop one step earlier
+		$dataLength = strlen($data) - 1;
 
 		// Look through file for SOF marker
 		for ($i = 0; $i < $dataLength; $i++)
@@ -124,7 +125,11 @@ class TypeJpeg extends TypeBase
 				// Skip over length of APP header
 				$i += (int) $length;
 			}
-
+			
+			// avoid out of range index
+			if ($i > $dataLength) {
+				break;
+			}
 			if ($this->isSofMarker($data[$i], $data[$i + 1]))
 			{
 				// Extract size info from SOF marker

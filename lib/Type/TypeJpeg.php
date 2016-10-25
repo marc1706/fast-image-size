@@ -124,12 +124,14 @@ class TypeJpeg extends TypeBase
 
 				// Skip over length of APP header
 				$i += (int) $length;
+
+				// Make sure we don't exceed the data length
+				if ($i >= $dataLength)
+				{
+					break;
+				}
 			}
-			
-			// avoid out of range index
-			if ($i > $dataLength) {
-				break;
-			}
+
 			if ($this->isSofMarker($data[$i], $data[$i + 1]))
 			{
 				// Extract size info from SOF marker

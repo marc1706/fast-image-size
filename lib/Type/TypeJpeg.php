@@ -14,8 +14,8 @@ namespace FastImageSize\Type;
 class TypeJpeg extends TypeBase
 {
 	/** @var int JPEG max header size. Headers can be bigger, but we'll abort
-	 *			going throught he header after this */
-	const JPEG_MAX_HEADER_SIZE = 24576;
+	 *			going through the header after this */
+	const JPEG_MAX_HEADER_SIZE = 124576;
 
 	/** @var string JPEG header */
 	const JPEG_HEADER = "\xFF\xD8";
@@ -111,16 +111,27 @@ class TypeJpeg extends TypeBase
 		$size = array();
 		// since we check $i + 1 we need to stop one step earlier
 		$dataLength = strlen($data) - 1;
+		$foundExif = $foundXmp = false;
 
 		// Look through file for SOF marker
 		for ($i = 0; $i < $dataLength; $i++)
 		{
-			if ($this->isAppMarker($data[$i], $data[$i + 1]))
+			// Only look for EXIF and XMP app marker once, other types more often
+			if ((!$foundExif || !$foundXmp || $data[$i + 1] !== "\xE1") && $this->isAppMarker($data[$i], $data[$i + 1]))
 			{
 				// Extract length from APP marker
 				list(, $unpacked) = unpack("H*", substr($data, $i + self::SHORT_SIZE, 2));
 
 				$length = hexdec(substr($unpacked, 0, 4));
+
+				if (!$foundExif)
+				{
+					$foundExif = $data[$i + 1] === "\xE1";
+				}
+				else if (!$foundXmp)
+				{
+					$foundXmp = $data[$i + 1] === "\xE1";
+				}
 
 				// Skip over length of APP header
 				$i += (int) $length;
@@ -135,12 +146,12 @@ class TypeJpeg extends TypeBase
 			if ($this->isSofMarker($data[$i], $data[$i + 1]))
 			{
 				// Extract size info from SOF marker
-				list(, $unpacked) = unpack("H*", substr($data, $i + self::SHORT_SIZE, 7));
+				list(, $unpacked) = unpack("H*", substr($data, $i + self::LONG_SIZE + 1, self::LONG_SIZE));
 
 				// Get width and height from unpacked size info
 				$size = array(
-					'width'		=> hexdec(substr($unpacked, 10, 4)),
-					'height'	=> hexdec(substr($unpacked, 6, 4)),
+					'width'		=> hexdec(substr($unpacked, 4, 4)),
+					'height'	=> hexdec(substr($unpacked, 0, 4)),
 				);
 
 				break;

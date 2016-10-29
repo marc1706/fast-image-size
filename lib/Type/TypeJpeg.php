@@ -73,9 +73,7 @@ class TypeJpeg extends TypeBase
 	 */
 	public function getSize($filename)
 	{
-		// Do not force the data length
-		//$this->data = $this->fastImageSize->getImage($filename, 0, self::JPEG_MAX_HEADER_SIZE, false);
-
+		// Try acquiring seekable image data
 		try
 		{
 			$this->requestBody = $this->fastImageSize->getSeekableImageData($filename, 0);
@@ -85,11 +83,12 @@ class TypeJpeg extends TypeBase
 		}
 		catch (\GuzzleHttp\Exception\RequestException $exception)
 		{
+			// Do not force the data length
 			$this->data = $this->fastImageSize->getImage($filename, 0, self::JPEG_MAX_HEADER_SIZE, false);
 		}
 
 		// Check if file is jpeg
-		if ($this->data === false || substr($this->data, 0, self::SHORT_SIZE) !== self::JPEG_HEADER)
+		if (!$this->isValidJpeg())
 		{
 			return;
 		}
@@ -106,6 +105,16 @@ class TypeJpeg extends TypeBase
 
 		$this->fastImageSize->setSize($size);
 		$this->fastImageSize->setImageType(IMAGETYPE_JPEG);
+	}
+
+	/**
+	 * Check whether data is valid for a JPEG file
+	 *
+	 * @return bool True if file is valid JPEG file, false if not
+	 */
+	protected function isValidJpeg()
+	{
+		return $this->data !== false && substr($this->data, 0, self::SHORT_SIZE) === self::JPEG_HEADER;
 	}
 
 	/**
@@ -164,22 +173,14 @@ class TypeJpeg extends TypeBase
 		for ($i = 0; $i < $this->dataLength; $i++)
 		{
 			// Only look for EXIF and XMP app marker once, other types more often
-			if (!$this->checkForAppMarker($this->dataLength, $i))
+			if (!$this->checkForAppMarker($i))
 			{
 				break;
 			}
 
-			if ($this->isSofMarker($this->data[$i], $this->data[$i + 1]))
+			// Break if SOF marker was evaluated
+			if ($this->checkForSofMarker($i, $size))
 			{
-				// Extract size info from SOF marker
-				list(, $unpacked) = unpack("H*", substr($this->data, $i + self::LONG_SIZE + 1, self::LONG_SIZE));
-
-				// Get width and height from unpacked size info
-				$size = array(
-					'width'		=> hexdec(substr($unpacked, 4, 4)),
-					'height'	=> hexdec(substr($unpacked, 0, 4)),
-				);
-
 				break;
 			}
 		}
@@ -205,22 +206,13 @@ class TypeJpeg extends TypeBase
 		{
 			$this->readDataFromStream($i);
 			// Only look for EXIF and XMP app marker once, other types more often
-			if (!$this->checkForAppMarker($this->dataLength, $i) && !$this->readDataFromStream($i))
+			if (!$this->checkForAppMarker($i) && !$this->readDataFromStream($i))
 			{
 				break;
 			}
 
-			if ($this->isSofMarker($this->data[$i], $this->data[$i + 1]))
+			if ($this->checkForSofMarker($i, $size))
 			{
-				// Extract size info from SOF marker
-				list(, $unpacked) = unpack("H*", substr($this->data, $i + self::LONG_SIZE + 1, self::LONG_SIZE));
-
-				// Get width and height from unpacked size info
-				$size = array(
-					'width'		=> hexdec(substr($unpacked, 4, 4)),
-					'height'	=> hexdec(substr($unpacked, 0, 4)),
-				);
-
 				break;
 			}
 
@@ -233,12 +225,11 @@ class TypeJpeg extends TypeBase
 	/**
 	 * Check for APP marker in data
 	 *
-	 * @param int $dataLength Length of input data
 	 * @param int $index Current data index
 	 *
 	 * @return bool True if searching through data should be continued, false if not
 	 */
-	protected function checkForAppMarker($dataLength, &$index)
+	protected function checkForAppMarker(&$index)
 	{
 		if ($this->isApp1Marker($this->data[$index], $this->data[$index + 1]) || $this->isAppMarker($this->data[$index], $this->data[$index + 1]))
 		{
@@ -253,13 +244,40 @@ class TypeJpeg extends TypeBase
 			$index += (int) $length;
 
 			// Make sure we don't exceed the data length
-			if ($index >= $dataLength)
+			if ($index >= $this->dataLength)
 			{
 				return false;
 			}
 		}
 
 		return true;
+	}
+
+	/**
+	 * Check for valid SOF marker at specified index and extract size info if
+	 *		marker is valid
+	 *
+	 * @param int $index Data index
+	 * @param array $size Size array
+	 * @return bool True if SOF marker was found, false if not
+	 */
+	protected function checkForSofMarker($index, &$size)
+	{
+		if ($this->isSofMarker($this->data[$index], $this->data[$index + 1]))
+		{
+			// Extract size info from SOF marker
+			list(, $unpacked) = unpack("H*", substr($this->data, $index + self::LONG_SIZE + 1, self::LONG_SIZE));
+
+			// Get width and height from unpacked size info
+			$size = array(
+				'width'		=> hexdec(substr($unpacked, 4, 4)),
+				'height'	=> hexdec(substr($unpacked, 0, 4)),
+			);
+
+			return true;
+		}
+
+		return false;
 	}
 
 	/**

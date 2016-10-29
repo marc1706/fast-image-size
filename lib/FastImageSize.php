@@ -97,6 +97,16 @@ class FastImageSize
 	}
 
 	/**
+	 * Get size array
+	 *
+	 * @return array|bool Size array if size could be evaluated, false if not
+	 */
+	protected function getSize()
+	{
+		return sizeof($this->size) > 1 ? $this->size : false;
+	}
+
+	/**
 	 * Get image dimensions of supplied image
 	 *
 	 * @param string $file Path to image that should be checked
@@ -120,7 +130,7 @@ class FastImageSize
 			$this->getImageSizeByExtension($file, strtolower($extension));
 		}
 
-		return sizeof($this->size) > 1 ? $this->size : false;
+		return $this->getSize();
 	}
 
 	/**
@@ -268,9 +278,12 @@ class FastImageSize
 	}
 
 	/**
-	 * @param $filename
-	 * @param $offset
-	 * @return \GuzzleHttp\Stream\StreamInterface|null
+	 * Get seekable image data in form of Guzzle stream interface
+	 *
+	 * @param string $filename Filename / URL to get
+	 * @param int $offset Offset for response body
+	 * @return \GuzzleHttp\Stream\StreamInterface|null Stream interface of
+	 *		requested image or null if it could not be retrieved
 	 */
 	public function getSeekableImageData($filename, $offset)
 	{

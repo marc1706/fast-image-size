@@ -243,17 +243,13 @@ class FastImageSize
 		{
 			try
 			{
-				$guzzleClient = new \GuzzleHttp\Client();
-				// Set stream to true to not read full file data during request
-				$response = $guzzleClient->get($filename, ['stream' => true]);
-
-				$body = $response->getBody();
+				$body = $this->getSeekableImageData($filename, $offset);
 
 				while (!$body->eof())
 				{
 					$readLength = min($length - strlen($this->data), 8192);
 					$this->data .= $body->read($readLength);
-					if ($readLength < 8192)
+					if ($readLength < 8192 || strlen($this->data == $readLength))
 					{
 						break;
 					}
@@ -264,9 +260,31 @@ class FastImageSize
 				// Silently fail in case of issues during guzzle request
 			}
 		}
-		else if ($this->isFopenEnabled)
+
+		if (empty($this->data) && $this->isFopenEnabled)
 		{
 			$this->data = @file_get_contents($filename, null, null, $offset, $length);
 		}
+	}
+
+	/**
+	 * @param $filename
+	 * @param $offset
+	 * @return \GuzzleHttp\Stream\StreamInterface|null
+	 */
+	public function getSeekableImageData($filename, $offset)
+	{
+		$guzzleClient = new \GuzzleHttp\Client();
+		// Set stream to true to not read full file data during request
+		$response = $guzzleClient->get($filename, ['stream' => true]);
+
+		$body = $response->getBody();
+
+		if ($offset > 0 && !$body->eof())
+		{
+			$body->seek($offset);
+		}
+
+		return $body;
 	}
 }

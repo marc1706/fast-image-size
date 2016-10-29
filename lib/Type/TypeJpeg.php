@@ -17,6 +17,8 @@ class TypeJpeg extends TypeBase
 	 *			going through the header after this */
 	const JPEG_MAX_HEADER_SIZE = 124576;
 
+	const JPEG_CHUNK_SIZE = 8192;
+
 	/** @var string JPEG header */
 	const JPEG_HEADER = "\xFF\xD8";
 
@@ -55,6 +57,11 @@ class TypeJpeg extends TypeBase
 	/** @var string|bool $data JPEG data stream */
 	protected $data = '';
 
+	protected $dataLength = 0;
+
+	/** @var \GuzzleHttp\Stream\StreamInterface Stream interface */
+	protected $requestBody;
+
 	/** @var bool Flag whether exif was found */
 	protected $foundExif = false;
 
@@ -67,7 +74,19 @@ class TypeJpeg extends TypeBase
 	public function getSize($filename)
 	{
 		// Do not force the data length
-		$this->data = $this->fastImageSize->getImage($filename, 0, self::JPEG_MAX_HEADER_SIZE, false);
+		//$this->data = $this->fastImageSize->getImage($filename, 0, self::JPEG_MAX_HEADER_SIZE, false);
+
+		try
+		{
+			$this->requestBody = $this->fastImageSize->getSeekableImageData($filename, 0);
+
+			// Get first part of data
+			$this->readDataFromStream(0);
+		}
+		catch (\GuzzleHttp\Exception\RequestException $exception)
+		{
+			$this->data = $this->fastImageSize->getImage($filename, 0, self::JPEG_MAX_HEADER_SIZE, false);
+		}
 
 		// Check if file is jpeg
 		if ($this->data === false || substr($this->data, 0, self::SHORT_SIZE) !== self::JPEG_HEADER)
@@ -76,7 +95,14 @@ class TypeJpeg extends TypeBase
 		}
 
 		// Look through file for SOF marker
-		$size = $this->getSizeInfo();
+		if ($this->requestBody)
+		{
+			$size = $this->getSizeInfoFromSeekable();
+		}
+		else
+		{
+			$size = $this->getSizeInfo();
+		}
 
 		$this->fastImageSize->setSize($size);
 		$this->fastImageSize->setImageType(IMAGETYPE_JPEG);
@@ -131,14 +157,14 @@ class TypeJpeg extends TypeBase
 	{
 		$size = array();
 		// since we check $i + 1 we need to stop one step earlier
-		$dataLength = strlen($this->data) - 1;
+		$this->dataLength = strlen($this->data) - 1;
 		$this->foundExif = $this->foundXmp = false;
 
 		// Look through file for SOF marker
-		for ($i = 0; $i < $dataLength; $i++)
+		for ($i = 0; $i < $this->dataLength; $i++)
 		{
 			// Only look for EXIF and XMP app marker once, other types more often
-			if (!$this->checkForAppMarker($dataLength, $i))
+			if (!$this->checkForAppMarker($this->dataLength, $i))
 			{
 				break;
 			}
@@ -156,6 +182,49 @@ class TypeJpeg extends TypeBase
 
 				break;
 			}
+		}
+
+		return $size;
+	}
+
+	/**
+	 * Get size info from image data
+	 *
+	 * @return array An array with the image's size info or an empty array if
+	 *		size info couldn't be found
+	 */
+	protected function getSizeInfoFromSeekable()
+	{
+		$size = array();
+		// since we check $i + 1 we need to stop one step earlier
+		$this->foundExif = $this->foundXmp = false;
+		$i = 0;
+
+		// Look through file for SOF marker
+		while (true)
+		{
+			$this->readDataFromStream($i);
+			// Only look for EXIF and XMP app marker once, other types more often
+			if (!$this->checkForAppMarker($this->dataLength, $i) && !$this->readDataFromStream($i))
+			{
+				break;
+			}
+
+			if ($this->isSofMarker($this->data[$i], $this->data[$i + 1]))
+			{
+				// Extract size info from SOF marker
+				list(, $unpacked) = unpack("H*", substr($this->data, $i + self::LONG_SIZE + 1, self::LONG_SIZE));
+
+				// Get width and height from unpacked size info
+				$size = array(
+					'width'		=> hexdec(substr($unpacked, 4, 4)),
+					'height'	=> hexdec(substr($unpacked, 0, 4)),
+				);
+
+				break;
+			}
+
+			$i++;
 		}
 
 		return $size;
@@ -208,5 +277,34 @@ class TypeJpeg extends TypeBase
 		{
 			$this->foundXmp = $data === $this->appMarkers[1];
 		}
+	}
+
+	/**
+	 * Read data from request body
+	 *
+	 * @param $index
+	 * @return bool
+	 */
+	protected function readDataFromStream($index)
+	{
+		$this->dataLength = strlen($this->data) - 1;
+		if ($index >= $this->dataLength && !$this->requestBody->eof())
+		{
+			$seekOffset = $index - $this->dataLength - 1;
+
+			// Seek and add junk data if we're jumping forward inside the string
+			if ($seekOffset > 0)
+			{
+				$this->requestBody->seek($seekOffset);
+				$this->data .= str_repeat('0', $seekOffset);
+			}
+			$this->data .= $this->requestBody->read(self::JPEG_CHUNK_SIZE);
+		}
+
+		if ($this->requestBody->eof() || $index > self::JPEG_MAX_HEADER_SIZE)
+		{
+			return false;
+		}
+		return true;
 	}
 }

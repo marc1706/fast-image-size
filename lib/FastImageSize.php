@@ -13,6 +13,9 @@ namespace FastImageSize;
 
 class FastImageSize
 {
+	/** @var bool Flag whether allow_url_fopen is enabled */
+	protected $isFopenEnabled = false;
+
 	/** @var array Size info that is returned */
 	protected $size = array();
 
@@ -76,6 +79,9 @@ class FastImageSize
 	 */
 	public function __construct()
 	{
+		$iniGet = new \bantu\IniGetWrapper\IniGetWrapper();
+		$this->isFopenEnabled = $iniGet->getBool('allow_url_fopen');
+
 		foreach ($this->supportedTypes as $imageType => $extension)
 		{
 			$className = '\FastImageSize\Type\Type' . mb_convert_case(mb_strtolower($imageType), MB_CASE_TITLE);
@@ -199,7 +205,7 @@ class FastImageSize
 	{
 		if (empty($this->data))
 		{
-			$this->data = @file_get_contents($filename, null, null, $offset, $length);
+			$this->getImageData($filename, $offset, $length);
 		}
 
 		// Force length to expected one. Return false if data length
@@ -220,5 +226,47 @@ class FastImageSize
 	protected function getReturnData()
 	{
 		return sizeof($this->size) > 1 ? $this->size : false;
+	}
+
+	/**
+	 * Get image data for specified filename with offset and length
+	 *
+	 * @param string $filename Path to image
+	 * @param int $offset Offset at which reading of the image should start
+	 * @param int $length Maximum length that should be read
+	 */
+	protected function getImageData($filename, $offset, $length)
+	{
+		// Check if we don't have a valid scheme according to RFC 3986 and
+		// try to use file_get_contents in that case
+		if (preg_match('#^([a-z][a-z0-9+\-.]+://)#i', $filename))
+		{
+			try
+			{
+				$guzzleClient = new \GuzzleHttp\Client();
+				// Set stream to true to not read full file data during request
+				$response = $guzzleClient->get($filename, ['stream' => true]);
+
+				$body = $response->getBody();
+
+				while (!$body->eof())
+				{
+					$readLength = min($length - strlen($this->data), 8192);
+					$this->data .= $body->read($readLength);
+					if ($readLength < 8192)
+					{
+						break;
+					}
+				}
+			}
+			catch (\GuzzleHttp\Exception\RequestException $exception)
+			{
+				// Silently fail in case of issues during guzzle request
+			}
+		}
+		else if ($this->isFopenEnabled)
+		{
+			$this->data = @file_get_contents($filename, null, null, $offset, $length);
+		}
 	}
 }

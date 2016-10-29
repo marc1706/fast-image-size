@@ -123,7 +123,12 @@ class FastImageSize extends \PHPUnit_Framework_TestCase
 				'width'		=> 1100,
 				'height'	=> 729,
 				'type'		=> IMAGETYPE_JPEG,
-			), 'http://www.techspot.com/articles-info/1121/images/P34WS-12.jpg')
+			), 'http://www.techspot.com/articles-info/1121/images/P34WS-12.jpg'),
+			array(array(
+				'width'		=> 1,
+				'height'	=> 1,
+				'type'		=> IMAGETYPE_PNG,
+			), 'https://github.com/marc1706/fast-image-size/blob/master/tests/fixture/png?raw=true'),
 		);
 	}
 

@@ -52,7 +52,7 @@ class TypeJpeg extends TypeBase
 		"\xEE",
 	);
 
-	/** @var string $data JPEG data stream */
+	/** @var string|bool $data JPEG data stream */
 	protected $data = '';
 
 	/** @var bool Flag whether exif was found */
@@ -178,14 +178,7 @@ class TypeJpeg extends TypeBase
 
 			$length = hexdec(substr($unpacked, 0, 4));
 
-			if (!$this->foundExif)
-			{
-				$this->foundExif = $this->data[$index + 1] === $this->appMarkers[1];
-			}
-			else if (!$this->foundXmp)
-			{
-				$this->foundXmp = $this->data[$index + 1] === $this->appMarkers[1];
-			}
+			$this->setApp1Flags($this->data[$index + 1]);
 
 			// Skip over length of APP header
 			$index += (int) $length;
@@ -198,5 +191,22 @@ class TypeJpeg extends TypeBase
 		}
 
 		return true;
+	}
+
+	/**
+	 * Set APP1 flags for specified data point
+	 *
+	 * @param string $data Data point
+	 */
+	protected function setApp1Flags($data)
+	{
+		if (!$this->foundExif)
+		{
+			$this->foundExif = $data === $this->appMarkers[1];
+		}
+		else if (!$this->foundXmp)
+		{
+			$this->foundXmp = $data === $this->appMarkers[1];
+		}
 	}
 }

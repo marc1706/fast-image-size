@@ -37,6 +37,18 @@ class StreamReader
 	}
 
 	/**
+	 * Get force length data
+	 *
+	 * @param int $offset
+	 * @param int $length
+	 * @return bool|string Returned data if long enough, false if not
+	 */
+	protected function getForcedLengthData($offset, $length)
+	{
+		return (strlen($this->data) < ($length + $offset)) ? false : substr($this->data, $offset, $length);
+	}
+
+	/**
 	 * Get image from specified path/source
 	 *
 	 * @param string $filename Path to image
@@ -58,7 +70,7 @@ class StreamReader
 		// is smaller than expected length
 		if ($forceLength === true)
 		{
-			return (strlen($this->data) < $length) ? false : substr($this->data, $offset, $length) ;
+			return $this->getForcedLengthData($offset, $length);
 		}
 
 		return empty($this->data) ? false : $this->data;
@@ -97,7 +109,20 @@ class StreamReader
 			}
 		}
 
-		if (empty($this->data) && $this->isFopenEnabled)
+		$this->getImageDataFopen($filename, $offset, $length);
+	}
+
+	/**
+	 * Get image data using file get contents if data is empty and
+	 *		allow_url_fopen is enabled
+	 *
+	 * @param string $filename Path to image
+	 * @param int $offset Offset at which reading of the image should start
+	 * @param int $length Maximum length that should be read
+	 */
+	protected function getImageDataFopen($filename, $offset, $length)
+	{
+		if ($this->isFopenEnabled && empty($this->data))
 		{
 			$this->data = @file_get_contents($filename, null, null, $offset, $length);
 		}

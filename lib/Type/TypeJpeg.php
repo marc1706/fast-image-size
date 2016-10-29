@@ -52,22 +52,31 @@ class TypeJpeg extends TypeBase
 		"\xEE",
 	);
 
+	/** @var string $data JPEG data stream */
+	protected $data = '';
+
+	/** @var bool Flag whether exif was found */
+	protected $foundExif = false;
+
+	/** @var bool Flag whether xmp was found */
+	protected $foundXmp = false;
+
 	/**
 	 * {@inheritdoc}
 	 */
 	public function getSize($filename)
 	{
 		// Do not force the data length
-		$data = $this->fastImageSize->getImage($filename, 0, self::JPEG_MAX_HEADER_SIZE, false);
+		$this->data = $this->fastImageSize->getImage($filename, 0, self::JPEG_MAX_HEADER_SIZE, false);
 
 		// Check if file is jpeg
-		if (substr($data, 0, self::SHORT_SIZE) !== self::JPEG_HEADER || $data === false)
+		if ($this->data === false || substr($this->data, 0, self::SHORT_SIZE) !== self::JPEG_HEADER)
 		{
 			return;
 		}
 
 		// Look through file for SOF marker
-		$size = $this->getSizeInfo($data);
+		$size = $this->getSizeInfo();
 
 		$this->fastImageSize->setSize($size);
 		$this->fastImageSize->setImageType(IMAGETYPE_JPEG);
@@ -91,6 +100,7 @@ class TypeJpeg extends TypeBase
 	 *
 	 * @param string $firstByte First byte to check
 	 * @param string $secondByte Second byte to check
+	 *
 	 * @return bool True if current data point is APP marker, false if not
 	 */
 	protected function isAppMarker($firstByte, $secondByte)
@@ -99,54 +109,44 @@ class TypeJpeg extends TypeBase
 	}
 
 	/**
-	 * Get size info from image data
+	 * Return if current data point is a valid APP1 marker (EXIF or XMP)
 	 *
-	 * @param string $data JPEG data stream
+	 * @param string $firstByte First byte to check
+	 * @param string $secondByte Second byte to check
+	 *
+	 * @return bool True if current data point is valid APP1 marker, false if not
+	 */
+	protected function isApp1Marker($firstByte, $secondByte)
+	{
+		return (!$this->foundExif || !$this->foundXmp) && $firstByte === self::SOF_START_MARKER && $secondByte === $this->appMarkers[1];
+	}
+
+	/**
+	 * Get size info from image data
 	 *
 	 * @return array An array with the image's size info or an empty array if
 	 *		size info couldn't be found
 	 */
-	protected function getSizeInfo($data)
+	protected function getSizeInfo()
 	{
 		$size = array();
 		// since we check $i + 1 we need to stop one step earlier
-		$dataLength = strlen($data) - 1;
-		$foundExif = $foundXmp = false;
+		$dataLength = strlen($this->data) - 1;
+		$this->foundExif = $this->foundXmp = false;
 
 		// Look through file for SOF marker
 		for ($i = 0; $i < $dataLength; $i++)
 		{
 			// Only look for EXIF and XMP app marker once, other types more often
-			if ((!$foundExif || !$foundXmp || $data[$i + 1] !== "\xE1") && $this->isAppMarker($data[$i], $data[$i + 1]))
+			if (!$this->checkForAppMarker($dataLength, $i))
 			{
-				// Extract length from APP marker
-				list(, $unpacked) = unpack("H*", substr($data, $i + self::SHORT_SIZE, 2));
-
-				$length = hexdec(substr($unpacked, 0, 4));
-
-				if (!$foundExif)
-				{
-					$foundExif = $data[$i + 1] === "\xE1";
-				}
-				else if (!$foundXmp)
-				{
-					$foundXmp = $data[$i + 1] === "\xE1";
-				}
-
-				// Skip over length of APP header
-				$i += (int) $length;
-
-				// Make sure we don't exceed the data length
-				if ($i >= $dataLength)
-				{
-					break;
-				}
+				break;
 			}
 
-			if ($this->isSofMarker($data[$i], $data[$i + 1]))
+			if ($this->isSofMarker($this->data[$i], $this->data[$i + 1]))
 			{
 				// Extract size info from SOF marker
-				list(, $unpacked) = unpack("H*", substr($data, $i + self::LONG_SIZE + 1, self::LONG_SIZE));
+				list(, $unpacked) = unpack("H*", substr($this->data, $i + self::LONG_SIZE + 1, self::LONG_SIZE));
 
 				// Get width and height from unpacked size info
 				$size = array(
@@ -159,5 +159,44 @@ class TypeJpeg extends TypeBase
 		}
 
 		return $size;
+	}
+
+	/**
+	 * Check for APP marker in data
+	 *
+	 * @param int $dataLength Length of input data
+	 * @param int $index Current data index
+	 *
+	 * @return bool True if searching through data should be continued, false if not
+	 */
+	protected function checkForAppMarker($dataLength, &$index)
+	{
+		if ($this->isApp1Marker($this->data[$index], $this->data[$index + 1]) || $this->isAppMarker($this->data[$index], $this->data[$index + 1]))
+		{
+			// Extract length from APP marker
+			list(, $unpacked) = unpack("H*", substr($this->data, $index + self::SHORT_SIZE, 2));
+
+			$length = hexdec(substr($unpacked, 0, 4));
+
+			if (!$this->foundExif)
+			{
+				$this->foundExif = $this->data[$index + 1] === $this->appMarkers[1];
+			}
+			else if (!$this->foundXmp)
+			{
+				$this->foundXmp = $this->data[$index + 1] === $this->appMarkers[1];
+			}
+
+			// Skip over length of APP header
+			$index += (int) $length;
+
+			// Make sure we don't exceed the data length
+			if ($index >= $dataLength)
+			{
+				return false;
+			}
+		}
+
+		return true;
 	}
 }

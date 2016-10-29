@@ -26,7 +26,7 @@ class TypeIco extends TypeBase
 	{
 		// Retrieve image data for ICO header and header of first entry.
 		// We assume the first entry to have the same size as the other ones.
-		$data = $this->fastImageSize->getImage($filename, 0, 2 * self::LONG_SIZE);
+		$data = $this->streamReader->getImage($filename, 0, 2 * self::LONG_SIZE);
 
 		if ($data === false)
 		{

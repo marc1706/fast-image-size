@@ -11,6 +11,8 @@
 
 namespace FastImageSize\Tests;
 
+use FastImageSize\StreamReader;
+
 require_once __DIR__ . '/../vendor/autoload.php';
 
 class TypeJpeg extends \PHPUnit_Framework_TestCase
@@ -28,7 +30,7 @@ class TypeJpeg extends \PHPUnit_Framework_TestCase
 	{
 		parent::setUp();
 		$this->imagesize = new \FastImageSize\FastImageSize();
-		$this->typeJpeg = new \FastImageSize\Type\TypeJpeg($this->imagesize);
+		$this->typeJpeg = new \FastImageSize\Type\TypeJpeg($this->imagesize, new StreamReader());
 		$this->path = __DIR__ . '/fixture/';
 	}
 

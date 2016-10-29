@@ -27,7 +27,7 @@ class TypeBmp extends TypeBase
 	 */
 	public function getSize($filename)
 	{
-		$data = $this->fastImageSize->getImage($filename, 0, self::BMP_HEADER_SIZE);
+		$data = $this->streamReader->getImage($filename, 0, self::BMP_HEADER_SIZE);
 
 		// Check if supplied file is a BMP file
 		if (substr($data, 0, 2) !== self::BMP_SIGNATURE)

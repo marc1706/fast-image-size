@@ -49,7 +49,7 @@ class TypeIff extends TypeBase
 	 */
 	public function getSize($filename)
 	{
-		$data = $this->fastImageSize->getImage($filename, 0, self::IFF_HEADER_SIZE);
+		$data = $this->streamReader->getImage($filename, 0, self::IFF_HEADER_SIZE);
 
 		$signature = $this->getIffSignature($data);
 

@@ -19,7 +19,7 @@ It currently supports the following image types:
 
 ### Requirements
 
-PHP 5.3.0 or newer is required for this library to work.
+PHP 5.4.0 or newer is required for this library to work.
 
 ### Installation
 
@@ -27,7 +27,7 @@ It is recommend to install the library using composer.
 Just add the following snippet to your composer.json:
 ```
   "require": {
-    "marc1706/fast-image-size": "1.*"
+    "marc1706/fast-image-size": "~2.0"
   },
 ```
 

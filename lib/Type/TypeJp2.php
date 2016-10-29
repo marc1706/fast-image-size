@@ -27,7 +27,7 @@ class TypeJp2 extends TypeBase
 	 */
 	public function getSize($filename)
 	{
-		$data = $this->fastImageSize->getImage($filename, 0, TypeJpeg::JPEG_MAX_HEADER_SIZE, false);
+		$data = $this->streamReader->getImage($filename, 0, TypeJpeg::JPEG_MAX_HEADER_SIZE, false);
 
 		// Check if file is jpeg 2000
 		if (substr($data, 0, strlen(self::JPEG_2000_SIGNATURE)) !== self::JPEG_2000_SIGNATURE)

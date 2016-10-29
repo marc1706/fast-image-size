@@ -76,7 +76,7 @@ class TypeJpeg extends TypeBase
 		// Try acquiring seekable image data
 		try
 		{
-			$this->requestBody = $this->fastImageSize->getSeekableImageData($filename, 0);
+			$this->requestBody = $this->streamReader->getSeekableImageData($filename, 0);
 
 			// Get first part of data
 			$this->readDataFromStream(0);
@@ -84,7 +84,7 @@ class TypeJpeg extends TypeBase
 		catch (\GuzzleHttp\Exception\RequestException $exception)
 		{
 			// Do not force the data length
-			$this->data = $this->fastImageSize->getImage($filename, 0, self::JPEG_MAX_HEADER_SIZE, false);
+			$this->data = $this->streamReader->getImage($filename, 0, self::JPEG_MAX_HEADER_SIZE, false);
 		}
 
 		// Check if file is jpeg

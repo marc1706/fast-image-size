@@ -11,6 +11,8 @@
 
 namespace FastImageSize\Tests;
 
+use FastImageSize\StreamReader;
+
 require_once __DIR__ . '/../vendor/autoload.php';
 
 class FastImageSize extends \PHPUnit_Framework_TestCase
@@ -99,7 +101,7 @@ class FastImageSize extends \PHPUnit_Framework_TestCase
 			array('png.PNG', 'image/png', array('width' => 1, 'height' => 1, 'type' => IMAGETYPE_PNG)),
 			array('png.PNG', '', array('width' => 1, 'height' => 1, 'type' => IMAGETYPE_PNG)),
 			array('jpg.JPG', 'image/png', array('width' => 1, 'height' => 1, 'type' => IMAGETYPE_JPEG)), // extension override incorrect mime type
-
+			array('unseekable_jpg.jpg', 'image/jpg', false),
 		);
 	}
 
@@ -129,6 +131,7 @@ class FastImageSize extends \PHPUnit_Framework_TestCase
 				'height'	=> 1,
 				'type'		=> IMAGETYPE_PNG,
 			), 'https://github.com/marc1706/fast-image-size/blob/master/tests/fixture/png?raw=true'),
+			array(false, 'https://github.com/marc1706/fast-image-size/blob/master/tests/fixture/unseekable_jpg.jpg?raw=true'),
 		);
 	}
 
@@ -138,5 +141,14 @@ class FastImageSize extends \PHPUnit_Framework_TestCase
 	public function test_getImageSize_remote($expected, $url)
 	{
 		$this->assertSame($expected, $this->imageSize->getImageSize($url));
+	}
+
+	public function test_getStreamData()
+	{
+		$streamReader = new StreamReader();
+
+		$data = $streamReader->getImage('https://secure.gravatar.com/avatar/55502f40dc8b7c769880b10874abc9d0.jpg', 5, 5, false);
+
+		$this->assertEquals(5, strlen($data));
 	}
 }

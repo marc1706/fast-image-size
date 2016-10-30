@@ -257,14 +257,7 @@ class TypeJpegHelper
 	{
 		if ($index >= $this->dataLength() && !$this->requestBody->eof())
 		{
-			$seekOffset = $index - $this->dataLength - 1;
-
-			// Seek and add junk data if we're jumping forward inside the string
-			if ($seekOffset > 0)
-			{
-				$this->requestBody->seek($seekOffset);
-				$this->data .= str_repeat('0', $seekOffset);
-			}
+			$this->seekData($index);
 			$this->data .= $this->requestBody->read(self::JPEG_CHUNK_SIZE);
 		}
 
@@ -273,5 +266,23 @@ class TypeJpegHelper
 			return false;
 		}
 		return true;
+	}
+
+	/**
+	 * Seek data if there is an offset between the current index and the
+	 * actual data length
+	 *
+	 * @param int $index Current index when cycling through data
+	 */
+	protected function seekData($index)
+	{
+		$seekOffset = $index - $this->dataLength - 1;
+
+		// Seek and add junk data if we're jumping forward inside the string
+		if ($seekOffset > 0)
+		{
+			$this->requestBody->seek($seekOffset);
+			$this->data .= str_repeat('0', $seekOffset);
+		}
 	}
 }

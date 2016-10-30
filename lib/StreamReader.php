@@ -11,6 +11,8 @@
 
 namespace FastImageSize;
 
+use FastImageSize\Type\TypeJpegHelper;
+
 class StreamReader
 {
 	/** @var bool Flag whether allow_url_fopen is enabled */
@@ -93,11 +95,9 @@ class StreamReader
 			{
 				$body = $this->getSeekableImageData($filename, $offset);
 
-				while (!$body->eof())
+				while ($body !== null && !$body->eof())
 				{
-					$readLength = min($length - strlen($this->data), 8192);
-					$this->data .= $body->read($readLength);
-					if ($readLength < 8192 || strlen($this->data == $readLength))
+					if (!$this->readDataFromBody($body, $length))
 					{
 						break;
 					}
@@ -110,6 +110,26 @@ class StreamReader
 		}
 
 		$this->getImageDataFopen($filename, $offset, $length);
+	}
+
+	/**
+	 * Read data from guzzle request body
+	 *
+	 * @param \GuzzleHttp\Stream\StreamInterface $body Request body as stream
+	 * @param int $length Requested length for file
+	 * @return bool True while reading and not having reached the end of the
+	 *		targeted length, false if end of targeted length has been reached
+	 */
+	protected function readDataFromBody(\GuzzleHttp\Stream\StreamInterface $body, $length)
+	{
+		$readLength = min($length - strlen($this->data), TypeJpegHelper::JPEG_CHUNK_SIZE);
+		$this->data .= $body->read($readLength);
+		if ($readLength < TypeJpegHelper::JPEG_CHUNK_SIZE || strlen($this->data == $readLength))
+		{
+			return false;
+		}
+
+		return true;
 	}
 
 	/**

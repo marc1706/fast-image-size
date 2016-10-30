@@ -132,6 +132,7 @@ class FastImageSize extends \PHPUnit_Framework_TestCase
 				'type'		=> IMAGETYPE_PNG,
 			), 'https://github.com/marc1706/fast-image-size/blob/master/tests/fixture/png?raw=true'),
 			array(false, 'https://github.com/marc1706/fast-image-size/blob/master/tests/fixture/unseekable_jpg.jpg?raw=true'),
+			array(false, 'https://github.com/marc1706/fast-image-size/blob/master/tests/fixture/jpg_no_size.jpg?raw=true'),
 		);
 	}
 

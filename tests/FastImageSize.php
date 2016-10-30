@@ -111,13 +111,27 @@ class FastImageSize extends \PHPUnit_Framework_TestCase
 		$this->assertEquals($expected, $this->imageSize->getImageSize($this->path . $file, $mime_type));
 	}
 
-	public function test_getImageSize_remote()
+	public function dataGetImageSizeRemote()
 	{
-		$this->assertSame(array(
-			'width'		=> 80,
-			'height'	=> 80,
-			'type'		=> IMAGETYPE_JPEG,
-		),
-			$this->imageSize->getImageSize('https://secure.gravatar.com/avatar/55502f40dc8b7c769880b10874abc9d0.jpg'));
+		return array(
+			array(array(
+				'width'		=> 80,
+				'height'	=> 80,
+				'type'		=> IMAGETYPE_JPEG,
+			), 'https://secure.gravatar.com/avatar/55502f40dc8b7c769880b10874abc9d0.jpg'),
+			array(array(
+				'width'		=> 1100,
+				'height'	=> 729,
+				'type'		=> IMAGETYPE_JPEG,
+			), 'http://www.techspot.com/articles-info/1121/images/P34WS-12.jpg')
+		);
+	}
+
+	/**
+	 * @dataProvider dataGetImageSizeRemote
+	 */
+	public function test_getImageSize_remote($expected, $url)
+	{
+		$this->assertSame($expected, $this->imageSize->getImageSize($url));
 	}
 }

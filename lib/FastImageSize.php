@@ -137,7 +137,7 @@ class FastImageSize
 	protected function getImagesizeUnknownType($filename)
 	{
 		// Grab the maximum amount of bytes we might need
-		$data = $this->streamReader->getImage($filename, 0, Type\TypeJpeg::JPEG_MAX_HEADER_SIZE, false);
+		$data = $this->streamReader->getImage($filename, 0, Type\TypeJpegHelper::JPEG_MAX_HEADER_SIZE, false);
 
 		if ($data !== false)
 		{

@@ -13,6 +13,9 @@ namespace FastImageSize\Type;
 
 class TypeJp2 extends TypeBase
 {
+	/** @var int JPEG 2000 max allowed header size */
+	const JPEG_2000_MAX_HEADER_SIZE = 24576;
+
 	/** @var string JPEG 2000 signature */
 	const JPEG_2000_SIGNATURE = "\x00\x00\x00\x0C\x6A\x50\x20\x20\x0D\x0A\x87\x0A";
 
@@ -27,7 +30,7 @@ class TypeJp2 extends TypeBase
 	 */
 	public function getSize($filename)
 	{
-		$data = $this->streamReader->getImage($filename, 0, TypeJpeg::JPEG_MAX_HEADER_SIZE, false);
+		$data = $this->streamReader->getImage($filename, 0, self::JPEG_2000_MAX_HEADER_SIZE, false);
 
 		// Check if file is jpeg 2000
 		if (substr($data, 0, strlen(self::JPEG_2000_SIGNATURE)) !== self::JPEG_2000_SIGNATURE)

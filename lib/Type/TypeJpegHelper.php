@@ -261,7 +261,7 @@ class TypeJpegHelper
 			$this->data .= $this->requestBody->read(self::JPEG_CHUNK_SIZE);
 		}
 
-		if ($this->requestBody->eof() || $index > self::JPEG_MAX_HEADER_SIZE)
+		if (($index >= $this->dataLength() && $this->requestBody->eof()) || $index > self::JPEG_MAX_HEADER_SIZE)
 		{
 			return false;
 		}

@@ -120,11 +120,16 @@ class TypeJpeg extends TypeBase
 		// Look through file for SOF marker
 		while (true)
 		{
-			$this->jpegHelper->readDataFromStream($i);
-			// Only look for EXIF and XMP app marker once, other types more often
-			if (!$this->jpegHelper->checkForAppMarker($i) && !$this->jpegHelper->readDataFromStream($i))
+			// Abort if we can no longer read from file
+			if (!$this->jpegHelper->readDataFromStream($i))
 			{
 				break;
+			}
+
+			// Only look for EXIF and XMP app marker once, other types more often
+			if (!$this->jpegHelper->checkForAppMarker($i))
+			{
+				continue;
 			}
 
 			if ($this->jpegHelper->checkForSofMarker($i, $size))

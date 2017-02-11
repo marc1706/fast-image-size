@@ -88,11 +88,11 @@ class FastImageSize extends \PHPUnit_Framework_TestCase
 			array('meh', 'image/meh', false),
 			array('exif.jpg', 'image/jpeg', array('width' => 100, 'height' => 100, 'type' => IMAGETYPE_JPEG)),
 			// Capital file names
-			array('JPG', 'image/jpg', array('width' => 1, 'height' => 1, 'type' => IMAGETYPE_JPEG)),
-			array('JPG', '', array('width' => 1, 'height' => 1, 'type' => IMAGETYPE_JPEG)),
-			array('PNG', 'image/png', array('width' => 1, 'height' => 1, 'type' => IMAGETYPE_PNG)),
-			array('PNG', '', array('width' => 1, 'height' => 1, 'type' => IMAGETYPE_PNG)),
-			array('JPG', 'image/png', false),
+			array('JPGL', 'image/jpg', array('width' => 1, 'height' => 1, 'type' => IMAGETYPE_JPEG)),
+			array('JPGL', '', array('width' => 1, 'height' => 1, 'type' => IMAGETYPE_JPEG)),
+			array('PNGL', 'image/png', array('width' => 1, 'height' => 1, 'type' => IMAGETYPE_PNG)),
+			array('PNGL', '', array('width' => 1, 'height' => 1, 'type' => IMAGETYPE_PNG)),
+			array('JPGL', 'image/png', false),
 			// Capital extesion
 			array('jpg.JPG', 'image/jpg', array('width' => 1, 'height' => 1, 'type' => IMAGETYPE_JPEG)),
 			array('jpg.JPG', '', array('width' => 1, 'height' => 1, 'type' => IMAGETYPE_JPEG)),

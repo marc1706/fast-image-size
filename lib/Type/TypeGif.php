@@ -29,7 +29,7 @@ class TypeGif extends TypeBase
 	{
 		// Get data needed for reading image dimensions as outlined by GIF87a
 		// and GIF89a specifications
-		$data = $this->fastImageSize->getImage($filename, 0, self::GIF_HEADER_SIZE + self::SHORT_SIZE * 2);
+		$data = $this->streamReader->getImage($filename, 0, self::GIF_HEADER_SIZE + self::SHORT_SIZE * 2);
 
 		$type = substr($data, 0, self::GIF_HEADER_SIZE);
 		if ($type !== self::GIF87A_HEADER && $type !== self::GIF89A_HEADER)

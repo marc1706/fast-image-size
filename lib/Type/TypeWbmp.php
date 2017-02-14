@@ -18,7 +18,7 @@ class TypeWbmp extends TypeBase
 	 */
 	public function getSize($filename)
 	{
-		$data = $this->fastImageSize->getImage($filename, 0, self::LONG_SIZE);
+		$data = $this->streamReader->getImage($filename, 0, self::LONG_SIZE);
 
 		// Check if image is WBMP
 		if ($data === false || !$this->validWBMP($data))

@@ -13,11 +13,11 @@ namespace FastImageSize;
 
 class FastImageSize
 {
+	/** @var StreamReader */
+	protected $streamReader;
+
 	/** @var array Size info that is returned */
 	protected $size = array();
-
-	/** @var string Data retrieved from remote */
-	protected $data = '';
 
 	/** @var array List of supported image types and associated image types */
 	protected $supportedTypes = array(
@@ -76,10 +76,12 @@ class FastImageSize
 	 */
 	public function __construct()
 	{
+		$this->streamReader = new StreamReader();
+
 		foreach ($this->supportedTypes as $imageType => $extension)
 		{
 			$className = '\FastImageSize\Type\Type' . mb_convert_case(mb_strtolower($imageType), MB_CASE_TITLE);
-			$this->type[$imageType] = new $className($this);
+			$this->type[$imageType] = new $className($this, $this->streamReader);
 
 			// Create class map
 			foreach ($extension as $ext)
@@ -88,6 +90,16 @@ class FastImageSize
 				$this->classMap[$ext] = $this->type[$imageType];
 			}
 		}
+	}
+
+	/**
+	 * Get size array
+	 *
+	 * @return array|bool Size array if size could be evaluated, false if not
+	 */
+	protected function getSize()
+	{
+		return sizeof($this->size) > 1 ? $this->size : false;
 	}
 
 	/**
@@ -114,7 +126,7 @@ class FastImageSize
 			$this->getImageSizeByExtension($file, $extension);
 		}
 
-		return sizeof($this->size) > 1 ? $this->size : false;
+		return $this->getSize();
 	}
 
 	/**
@@ -125,7 +137,7 @@ class FastImageSize
 	protected function getImagesizeUnknownType($filename)
 	{
 		// Grab the maximum amount of bytes we might need
-		$data = $this->getImage($filename, 0, Type\TypeJpeg::JPEG_MAX_HEADER_SIZE, false);
+		$data = $this->streamReader->getImage($filename, 0, Type\TypeJpegHelper::JPEG_MAX_HEADER_SIZE, false);
 
 		if ($data !== false)
 		{
@@ -162,7 +174,7 @@ class FastImageSize
 	protected function resetValues()
 	{
 		$this->size = array();
-		$this->data = '';
+		$this->streamReader->resetData();
 	}
 
 	/**
@@ -183,43 +195,5 @@ class FastImageSize
 	public function setSize($size)
 	{
 		$this->size = $size;
-	}
-
-	/**
-	 * Get image from specified path/source
-	 *
-	 * @param string $filename Path to image
-	 * @param int $offset Offset at which reading of the image should start
-	 * @param int $length Maximum length that should be read
-	 * @param bool $forceLength True if the length needs to be the specified
-	 *			length, false if not. Default: true
-	 *
-	 * @return false|string Image data or false if result was empty
-	 */
-	public function getImage($filename, $offset, $length, $forceLength = true)
-	{
-		if (empty($this->data))
-		{
-			$this->data = @file_get_contents($filename, null, null, $offset, $length);
-		}
-
-		// Force length to expected one. Return false if data length
-		// is smaller than expected length
-		if ($forceLength === true)
-		{
-			return (strlen($this->data) < $length) ? false : substr($this->data, $offset, $length) ;
-		}
-
-		return empty($this->data) ? false : $this->data;
-	}
-
-	/**
-	 * Get return data
-	 *
-	 * @return array|bool Size array if dimensions could be found, false if not
-	 */
-	protected function getReturnData()
-	{
-		return sizeof($this->size) > 1 ? $this->size : false;
 	}
 }

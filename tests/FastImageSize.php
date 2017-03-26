@@ -87,8 +87,8 @@ class FastImageSize extends \PHPUnit_Framework_TestCase
 			array('meh', '', false),
 			array('meh', 'image/meh', false),
 			array('exif.jpg', 'image/jpeg', array('width' => 100, 'height' => 100, 'type' => IMAGETYPE_JPEG)),
-			array('Yoko.jpg', '', array('width' => 3240, 'height' => 2176, 'type' => IMAGETYPE_JPEG)),
-			array('Yoko.jpg', 'image/jpg', array('width' => 3240, 'height' => 2176, 'type' => IMAGETYPE_JPEG)),
+			array('phpBB_logo.jpg', '', array('width' => 152, 'height' => 53, 'type' => IMAGETYPE_JPEG)),
+			array('phpBB_logo.jpg', 'image/jpg', array('width' => 152, 'height' => 53, 'type' => IMAGETYPE_JPEG)),
 			array('dog.jpg', '', array('width' => 300, 'height' => 300, 'type' => IMAGETYPE_JPEG)),
 			// Capital file names
 			array('JPGL', 'image/jpg', array('width' => 1, 'height' => 1, 'type' => IMAGETYPE_JPEG)),

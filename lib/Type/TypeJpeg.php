@@ -20,6 +20,9 @@ class TypeJpeg extends TypeBase
 	/** @var string JPEG header */
 	const JPEG_HEADER = "\xFF\xD8";
 
+	/** @var string JPEG EXIF header */
+	const JPEG_EXIF_HEADER = "\x45\x78\x69\x66\x00\x00";
+
 	/** @var string Start of frame marker */
 	const SOF_START_MARKER = "\xFF";
 
@@ -143,6 +146,13 @@ class TypeJpeg extends TypeBase
 				break;
 			}
 
+			$size = $this->checkExifData($i);
+
+			if (count($size) > 0)
+			{
+				break;
+			}
+
 			if ($this->isSofMarker($this->data[$i], $this->data[$i + 1]))
 			{
 				// Extract size info from SOF marker
@@ -181,7 +191,10 @@ class TypeJpeg extends TypeBase
 			$this->setApp1Flags($this->data[$index + 1]);
 
 			// Skip over length of APP header
-			$index += (int) $length;
+			if (!$this->isApp1Marker($this->data[$index], $this->data[$index + 1]))
+			{
+				$index += (int)$length;
+			}
 
 			// Make sure we don't exceed the data length
 			if ($index >= $dataLength)
@@ -208,5 +221,91 @@ class TypeJpeg extends TypeBase
 		{
 			$this->foundXmp = $data === $this->appMarkers[1];
 		}
+	}
+
+	/**
+	 * Check EXIF data for valid image dimensions
+	 *
+	 * @param int $index Current search index
+	 *
+	 * @return array Array with size info or empty array if no size info was found
+	 */
+	protected function checkExifData(&$index)
+	{
+		if ($this->foundExif && substr($this->data, $index + self::SHORT_SIZE, self::LONG_SIZE + self::SHORT_SIZE) == self::JPEG_EXIF_HEADER)
+		{
+			$typeTif = new TypeTif($this->fastImageSize);
+
+			$data = substr($this->data, $index + self::SHORT_SIZE * 2 + self::LONG_SIZE);
+
+			$signature = substr($data, 0, self::SHORT_SIZE);
+
+			$typeTif->setByteType($signature);
+
+			$size = array();
+
+			// Get offset of IFD
+			list(, $offset) = unpack($typeTif->typeLong, substr($data, self::LONG_SIZE, self::LONG_SIZE));
+
+			// Get size of IFD
+			list(, $sizeIfd) = unpack($typeTif->typeShort, substr($data, $offset, self::SHORT_SIZE));
+
+			// Skip 2 bytes that define the IFD size
+			$offset += self::SHORT_SIZE;
+
+			// Filter through IFD
+			for ($i = 0; $i <= $sizeIfd; $i++)
+			{
+				// Get IFD tag
+				$type = unpack($typeTif->typeShort, substr($data, $offset, self::SHORT_SIZE));
+
+				// Get field type of tag
+				$fieldType = unpack($typeTif->typeShort . 'type', substr($data, $offset + self::SHORT_SIZE, self::SHORT_SIZE));
+
+				// Get IFD entry
+				$ifdValue = substr($data, $offset + 2 * self::LONG_SIZE, self::LONG_SIZE);
+
+				// Set size of field
+				$fieldSize = $fieldType['type'] === TypeTif::TIF_TAG_TYPE_SHORT ? $typeTif->typeShort : $typeTif->typeLong;
+
+				if ($type[1] === TypeTif::TIF_TAG_EXIF_IMAGE_WIDTH)
+				{
+					$size = array_merge($size, (unpack($fieldSize . 'width', $ifdValue)));
+				}
+				else if ($type[1] === TypeTif::TIF_TAG_EXIF_IMAGE_HEIGHT)
+				{
+					$size = array_merge($size, (unpack($fieldSize . 'height', $ifdValue)));
+				}
+
+				// See if we can find the EXIF IFD data offset
+				if ($type[1] === TypeTif::TIF_TAG_EXIF_OFFSET)
+				{
+					list(, $newOffset) = unpack($fieldSize, $ifdValue);
+					list(, $newSizeIfd) = unpack($typeTif->typeShort, substr($data, $newOffset, self::SHORT_SIZE));
+					$i = 0;
+					$sizeIfd = $newSizeIfd;
+					$offset = $newOffset + self::SHORT_SIZE;
+					continue;
+				}
+
+				$offset += TypeTif::TIF_IFD_ENTRY_SIZE;
+			}
+
+			if (count($size) > 0 && !empty($size['width']) && !empty($size['height']))
+			{
+				return $size;
+			}
+			else if ($index >= 2 && $this->isApp1Marker($this->data[$index - 2], $this->data[$index - 1]))
+			{
+				// Extract length from APP marker and skip over it if it didn't
+				// contain the actual image dimensions
+				list(, $unpacked) = unpack("H*", substr($this->data, $index, 2));
+
+				$length = hexdec(substr($unpacked, 0, 4));
+				$index += $length - self::SHORT_SIZE;
+			}
+		}
+
+		return array();
 	}
 }

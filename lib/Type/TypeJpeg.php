@@ -248,7 +248,7 @@ class TypeJpeg extends TypeBase
 			list(, $offset) = unpack($typeTif->typeLong, substr($data, self::LONG_SIZE, self::LONG_SIZE));
 
 			// Get size of IFD
-			list(, $sizeIfd) = unpack($typeTif->typeShort, substr($data, $offset, self::SHORT_SIZE));
+			list(, $sizeIfd) = @unpack($typeTif->typeShort, substr($data, $offset, self::SHORT_SIZE));
 
 			// Skip 2 bytes that define the IFD size
 			$offset += self::SHORT_SIZE;
@@ -257,10 +257,10 @@ class TypeJpeg extends TypeBase
 			for ($i = 0; $i <= $sizeIfd; $i++)
 			{
 				// Get IFD tag
-				$type = unpack($typeTif->typeShort, substr($data, $offset, self::SHORT_SIZE));
+				$type = @unpack($typeTif->typeShort, substr($data, $offset, self::SHORT_SIZE));
 
 				// Get field type of tag
-				$fieldType = unpack($typeTif->typeShort . 'type', substr($data, $offset + self::SHORT_SIZE, self::SHORT_SIZE));
+				$fieldType = @unpack($typeTif->typeShort . 'type', substr($data, $offset + self::SHORT_SIZE, self::SHORT_SIZE));
 
 				// Get IFD entry
 				$ifdValue = substr($data, $offset + 2 * self::LONG_SIZE, self::LONG_SIZE);

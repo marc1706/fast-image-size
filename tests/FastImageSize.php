@@ -102,6 +102,7 @@ class FastImageSize extends \PHPUnit_Framework_TestCase
 			array('png.PNG', 'image/png', array('width' => 1, 'height' => 1, 'type' => IMAGETYPE_PNG)),
 			array('png.PNG', '', array('width' => 1, 'height' => 1, 'type' => IMAGETYPE_PNG)),
 			array('jpg.JPG', 'image/png', array('width' => 1, 'height' => 1, 'type' => IMAGETYPE_JPEG)), // extension override incorrect mime type
+			array('supercup.jpg', 'image/jpg', array('width' => 700, 'height' => 525, 'type' => IMAGETYPE_JPEG)),
 		);
 	}
 

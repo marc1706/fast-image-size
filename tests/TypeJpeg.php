@@ -37,11 +37,7 @@ class TypeJpeg extends \PHPUnit_Framework_TestCase
 		return array(
 			array(false, "\xFF\xD8somemorerandomdata1"),
 			array(false, "\xFF\xD8somedata\xFF\xE0\xFF\xFF\xFF\xFF"),
-			array(array(
-					'width'		=> 65535,
-					'height'	=> 65535,
-					'type'		=> IMAGETYPE_JPEG,
-				),
+			array(false,
 				"\xFF\xD8somedata\xFF\xC0\xFF\xFF\xFF\xFF\xFF\xFF\xFF"
 			),
 		);

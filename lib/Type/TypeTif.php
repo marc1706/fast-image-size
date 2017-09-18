@@ -74,7 +74,7 @@ class TypeTif extends TypeBase
 		$this->setByteType($signature);
 
 		// Get offset of IFD
-		list(, $offset) = unpack($this->typeLong, substr($data, self::LONG_SIZE, self::LONG_SIZE));
+		list(, $offset) = unpack($this->typeLong, substr($data, 0, self::LONG_SIZE));
 
 		// Get size of IFD
 		list(, $sizeIfd) = unpack($this->typeShort, substr($data, $offset, self::SHORT_SIZE));

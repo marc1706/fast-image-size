@@ -14,8 +14,8 @@ namespace FastImageSize\Type;
 class TypeTif extends TypeBase
 {
 	/** @var int TIF header size. The header might be larger but the dimensions
-	 *			should be in the first 512 bytes */
-	const TIF_HEADER_SIZE = 512;
+	 *			should be in the first 51200 bytes */
+	const TIF_HEADER_SIZE = 51200;
 
 	/** @var int TIF tag for image height */
 	const TIF_TAG_IMAGE_HEIGHT = 257;
@@ -81,6 +81,9 @@ class TypeTif extends TypeBase
 
 		// Skip 2 bytes that define the IFD size
 		$offset += self::SHORT_SIZE;
+
+		// Ensure size can't exceed data length
+		$sizeIfd = min($sizeIfd, floor((strlen($data) - $offset) / self::TIF_IFD_ENTRY_SIZE));
 
 		// Filter through IFD
 		for ($i = 0; $i < $sizeIfd; $i++)

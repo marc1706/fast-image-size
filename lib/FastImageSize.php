@@ -63,6 +63,9 @@ class FastImageSize
 				'x-icon',
 				'icon',
 		),
+		'webp'	=> array(
+				'webp',
+		)
 	);
 
 	/** @var array Class map that links image extensions/mime types to class */

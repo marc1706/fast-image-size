@@ -21,6 +21,16 @@ class FastImageSize extends \PHPUnit_Framework_TestCase
 	/** @var string Path to fixtures */
 	protected $path;
 
+	public function __construct($name = null, array $data = array(), $dataName = '')
+	{
+		parent::__construct($name, $data, $dataName);
+
+		if (!defined('IMAGETYPE_WEBP'))
+		{
+			define('IMAGETYPE_WEBP', 18);
+		}
+	}
+
 	public function setUp()
 	{
 		parent::setUp();
@@ -105,6 +115,15 @@ class FastImageSize extends \PHPUnit_Framework_TestCase
 			array('supercup.jpg', 'image/jpg', array('width' => 700, 'height' => 525, 'type' => IMAGETYPE_JPEG)),
 			array('641.jpg', 'image/jpg', array('width' => 641, 'height' => 399, 'type' => IMAGETYPE_JPEG)),
 			array('CCITT_1.TIF', '', array('width' => 1728, 'height' => 2376, 'type' => IMAGETYPE_TIFF_II)),
+			array('simple.webp', 'image/webp', array('width' => 550, 'height' => 368, 'type' => IMAGETYPE_WEBP)),
+			array('simple.webp', '', array('width' => 550, 'height' => 368, 'type' => IMAGETYPE_WEBP)),
+			array('simple.webp', 'image/jpeg', false),
+			array('lossless.webp', 'image/webp', array('width' => 386, 'height' => 395, 'type' => IMAGETYPE_WEBP)),
+			array('lossless.webp', '', array('width' => 386, 'height' => 395, 'type' => IMAGETYPE_WEBP)),
+			array('lossless.webp', 'image/jpeg', false),
+			array('extended.webp', 'image/webp', array('width' => 386, 'height' => 395, 'type' => IMAGETYPE_WEBP)),
+			array('extended.webp', '', array('width' => 386, 'height' => 395, 'type' => IMAGETYPE_WEBP)),
+			array('extended.webp', 'image/jpeg', false),
 		);
 	}
 

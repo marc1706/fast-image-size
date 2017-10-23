@@ -16,6 +16,7 @@ It currently supports the following image types:
 * PSD
 * TIF/TIFF
 * WBMP
+* WebP
 
 ### Requirements
 

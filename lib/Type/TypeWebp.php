@@ -64,13 +64,9 @@ class TypeWebp extends TypeBase
 
 		$this->size = array();
 
-		$riffSignature = substr($data, 0, self::LONG_SIZE);
-		$webpSignature = substr($data, 8, self::LONG_SIZE);
-		$vp8Signature = substr($data, 12, self::SHORT_SIZE + 1);
 		$webpFormat = substr($data, 15, 1);
 
-		if (!$data || $riffSignature !== self::WEBP_RIFF_HEADER ||
-			$webpSignature !== self::WEBP_HEADER || $vp8Signature !== self::VP8_HEADER)
+		if (!$this->hasWebpHeader($data) || !$this->isValidFormat($webpFormat))
 		{
 			return;
 		}
@@ -84,6 +80,34 @@ class TypeWebp extends TypeBase
 	}
 
 	/**
+	 * Check if $data has valid WebP header
+	 *
+	 * @param string $data Image data
+	 *
+	 * @return bool True if $data has valid WebP header, false if not
+	 */
+	protected function hasWebpHeader($data)
+	{
+		$riffSignature = substr($data, 0, self::LONG_SIZE);
+		$webpSignature = substr($data, 8, self::LONG_SIZE);
+		$vp8Signature = substr($data, 12, self::SHORT_SIZE + 1);
+
+		return !empty($data) && $riffSignature === self::WEBP_RIFF_HEADER &&
+			$webpSignature === self::WEBP_HEADER && $vp8Signature === self::VP8_HEADER;
+	}
+
+	/**
+	 * Check if $format is a valid WebP format
+	 *
+	 * @param string $format Format string
+	 * @return bool True if format is valid WebP format, false if not
+	 */
+	protected function isValidFormat($format)
+	{
+		return in_array($format, array(self::WEBP_FORMAT_SIMPLE, self::WEBP_FORMAT_LOSSLESS, self::WEBP_FORMAT_EXTENDED));
+	}
+
+	/**
 	 * Get webp size info depending on format type and set size array values
 	 *
 	 * @param string $data Data string
@@ -91,9 +115,6 @@ class TypeWebp extends TypeBase
 	 */
 	protected function getWebpSize($data, $format)
 	{
-		if (!in_array($format, array(self::WEBP_FORMAT_SIMPLE, self::WEBP_FORMAT_LOSSLESS, self::WEBP_FORMAT_EXTENDED)))
-			return;
-
 		switch ($format)
 		{
 			case self::WEBP_FORMAT_SIMPLE:

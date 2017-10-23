@@ -124,6 +124,8 @@ class FastImageSize extends \PHPUnit_Framework_TestCase
 			array('extended.webp', 'image/webp', array('width' => 386, 'height' => 395, 'type' => IMAGETYPE_WEBP)),
 			array('extended.webp', '', array('width' => 386, 'height' => 395, 'type' => IMAGETYPE_WEBP)),
 			array('extended.webp', 'image/jpeg', false),
+			array('wrong_format.webp', 'image/webp', false),
+			array('no_riff.webp', 'image/webp', false),
 		);
 	}
 

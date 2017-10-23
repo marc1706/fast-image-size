@@ -16,6 +16,7 @@ It currently supports the following image types:
 * PSD
 * TIF/TIFF
 * WBMP
+* WebP
 
 ### Requirements
 
@@ -65,3 +66,6 @@ The library is being tested using unit tests to prevent possible issues.
 ### License
 
 [The MIT License (MIT)](http://opensource.org/licenses/MIT)
+
+### Credits
+Sample files of WebP format by Google: [WebP Image Galleries](https://developers.google.com/speed/webp/gallery)

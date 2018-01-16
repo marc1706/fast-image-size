@@ -75,25 +75,6 @@ class FastImageSize
 	protected $type;
 
 	/**
-	 * Constructor for fastImageSize class
-	 */
-	public function __construct()
-	{
-		foreach ($this->supportedTypes as $imageType => $extension)
-		{
-			$className = '\FastImageSize\Type\Type' . mb_convert_case(mb_strtolower($imageType), MB_CASE_TITLE);
-			$this->type[$imageType] = new $className($this);
-
-			// Create class map
-			foreach ($extension as $ext)
-			{
-				/** @var Type\TypeInterface */
-				$this->classMap[$ext] = $this->type[$imageType];
-			}
-		}
-	}
-
-	/**
 	 * Get image dimensions of supplied image
 	 *
 	 * @param string $file Path to image that should be checked
@@ -132,6 +113,7 @@ class FastImageSize
 
 		if ($data !== false)
 		{
+			$this->loadAllTypes();
 			foreach ($this->type as $imageType)
 			{
 				$imageType->getSize($filename);
@@ -153,6 +135,7 @@ class FastImageSize
 	protected function getImageSizeByExtension($file, $extension)
 	{
 		$extension = strtolower($extension);
+		$this->loadExtension($extension);
 		if (isset($this->classMap[$extension]))
 		{
 			$this->classMap[$extension]->getSize($file);
@@ -224,5 +207,59 @@ class FastImageSize
 	protected function getReturnData()
 	{
 		return sizeof($this->size) > 1 ? $this->size : false;
+	}
+
+	/**
+	 * Load all supported types
+	 */
+	protected function loadAllTypes()
+	{
+		foreach ($this->supportedTypes as $imageType => $extension)
+		{
+			$this->loadType($imageType);
+		}
+	}
+
+	/**
+	 * Load an image type by extension
+	 *
+	 * @param string $extension Extension of image
+	 */
+	protected function loadExtension($extension)
+	{
+		if (isset($this->classMap[$extension]))
+		{
+			return;
+		}
+		foreach ($this->supportedTypes as $imageType => $extensions)
+		{
+			if (in_array($extension, $extensions, true))
+			{
+				$this->loadType($imageType);
+			}
+		}
+	}
+
+	/**
+	 * Load an image type
+	 *
+	 * @param string $imageType Mimetype
+	 */
+	protected function loadType($imageType)
+	{
+		if (isset($this->type[$imageType]))
+		{
+			return;
+		}
+
+		$className = '\FastImageSize\Type\Type' . mb_convert_case(mb_strtolower($imageType), MB_CASE_TITLE);
+		$this->type[$imageType] = new $className($this);
+
+		// Create class map
+		foreach ($this->supportedTypes[$imageType] as $ext)
+		{
+			/** @var Type\TypeInterface */
+			$this->classMap[$ext] = $this->type[$imageType];
+		}
 	}
 }

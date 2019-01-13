@@ -15,12 +15,9 @@ TRAVIS_PHP_VERSION=$1
 
 if [ "$TRAVIS_PHP_VERSION" == "5.6" ]
 then
-	phpunit --coverage-clover=coverage.clover
+	vendor/bin/phpunit --coverage-clover=coverage.clover
 	wget https://scrutinizer-ci.com/ocular.phar
 	php ocular.phar code-coverage:upload --format=php-clover coverage.clover
-elif [ "$TRAVIS_PHP_VERSION" == "hhvm" ]
-then
-    vendor/bin/phpunit
 else
-	phpunit
+	vendor/bin/phpunit
 fi

@@ -15,7 +15,7 @@ class TypeJpeg extends TypeBase
 {
 	/** @var int JPEG max header size. Headers can be bigger, but we'll abort
 	 *			going through the header after this */
-	const JPEG_MAX_HEADER_SIZE = 124576;
+	const JPEG_MAX_HEADER_SIZE = 786432; // = 768 kiB
 
 	/** @var string JPEG header */
 	const JPEG_HEADER = "\xFF\xD8";
@@ -41,17 +41,6 @@ class TypeJpeg extends TypeBase
 		"\xCD",
 		"\xCE",
 		"\xCF"
-	);
-
-	/** @var array JPEG APP markers */
-	protected $appMarkers = array(
-		"\xE0",
-		"\xE1",
-		"\xE2",
-		"\xE3",
-		"\xEC",
-		"\xED",
-		"\xEE",
 	);
 
 	/** @var string|bool JPEG data stream */

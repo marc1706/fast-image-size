@@ -77,7 +77,12 @@ class TypeTif extends TypeBase
 		list(, $offset) = unpack($this->typeLong, substr($data, self::LONG_SIZE, self::LONG_SIZE));
 
 		// Get size of IFD
-		list(, $sizeIfd) = unpack($this->typeShort, substr($data, $offset, self::SHORT_SIZE));
+		$ifdSizeInfo = substr($data, $offset, self::SHORT_SIZE);
+		if (empty($ifdSizeInfo))
+		{
+			return;
+		}
+		list(, $sizeIfd) = unpack($this->typeShort, $ifdSizeInfo);
 
 		// Skip 2 bytes that define the IFD size
 		$offset += self::SHORT_SIZE;

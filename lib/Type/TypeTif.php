@@ -15,22 +15,13 @@ class TypeTif extends TypeBase
 {
 	/** @var int TIF header size. The header might be larger but the dimensions
 	 *			should be in the first 51200 bytes */
-	const TIF_HEADER_SIZE = 51200;
+	const TIF_HEADER_SIZE = 262144;
 
 	/** @var int TIF tag for image height */
 	const TIF_TAG_IMAGE_HEIGHT = 257;
 
 	/** @var int TIF tag for image width */
 	const TIF_TAG_IMAGE_WIDTH = 256;
-
-	/** @var int TIF tag for exif IFD offset */
-	const TIF_TAG_EXIF_OFFSET = 34665;
-
-	/** @var int TIF tag for Image X resolution in pixels */
-	const TIF_TAG_EXIF_IMAGE_WIDTH = 0xA002;
-
-	/** @var int TIF tag for Image Y resolution in pixels */
-	const TIF_TAG_EXIF_IMAGE_HEIGHT = 0xA003;
 
 	/** @var int TIF tag type for short */
 	const TIF_TAG_TYPE_SHORT = 3;

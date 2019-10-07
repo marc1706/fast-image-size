@@ -14,7 +14,7 @@ namespace FastImageSize\Type;
 class TypeTif extends TypeBase
 {
 	/** @var int TIF header size. The header might be larger but the dimensions
-	 *			should be in the first 51200 bytes */
+	 *			should be in the first 256 kiB bytes */
 	const TIF_HEADER_SIZE = 262144;
 
 	/** @var int TIF tag for image height */

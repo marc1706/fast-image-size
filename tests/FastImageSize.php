@@ -67,6 +67,7 @@ class FastImageSize extends \PHPUnit_Framework_TestCase
 			array('tif_compressed', '', array('width' => 2, 'height' => 1, 'type' => IMAGETYPE_TIFF_II)),
 			array('tif_msb', 'image/tif', array('width' => 2, 'height' => 1, 'type' => IMAGETYPE_TIFF_MM)),
 			array('tif_msb', '', array('width' => 2, 'height' => 1, 'type' => IMAGETYPE_TIFF_MM)),
+			array('tif_error.tif', '', array('width' => 1920, 'height' => 1030, 'type' => IMAGETYPE_TIFF_II)),
 			array('wbmp', 'image/wbmp', array('width' => 2, 'height' => 1, 'type' => IMAGETYPE_WBMP)),
 			array('foobar', 'image/wbmp', false),
 			array('wbmp', 'image/vnd.wap.wbmp', array('width' => 2, 'height' => 1, 'type' => IMAGETYPE_WBMP)),

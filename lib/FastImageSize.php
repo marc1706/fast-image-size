@@ -79,7 +79,7 @@ class FastImageSize
 	 *
 	 * @param string $file Path to image that should be checked
 	 * @param string $type Mimetype of image
-	 * @return array|bool Array with image dimensions if successful, false if not
+	 * @return array|false Array with image dimensions if successful, false if not
 	 */
 	public function getImageSize($file, $type = '')
 	{

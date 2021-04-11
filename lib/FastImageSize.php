@@ -96,6 +96,12 @@ class FastImageSize
 			$extension = (empty($type) && isset($match[1])) ? $match[1] : preg_replace('/.+\/([a-z0-9-.]+)$/i', '$1', $type);
 
 			$this->getImageSizeByExtension($file, $extension);
+			
+			if(!(count($this->size) > 0))
+			{
+				$this->data = '';
+				$this->getImagesizeUnknownType($file);
+			}
 		}
 
 		return sizeof($this->size) > 1 ? $this->size : false;

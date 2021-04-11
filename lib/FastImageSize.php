@@ -97,7 +97,7 @@ class FastImageSize
 
 			$this->getImageSizeByExtension($file, $extension);
 			
-			if(!(sizeof($this->size) > 1))
+			if(!(count($this->size) > 0))
 			{
 				$this->data = '';
 				$this->getImagesizeUnknownType($file);

@@ -186,7 +186,7 @@ class FastImageSize
 	{
 		if (empty($this->data))
 		{
-			$this->data = @file_get_contents($filename, null, null, $offset, $length);
+			$this->data = @file_get_contents($filename, false, null, $offset, $length);
 		}
 
 		// Force length to expected one. Return false if data length

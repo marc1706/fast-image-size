@@ -11,9 +11,14 @@
 set -e
 set -x
 
-TRAVIS_PHP_VERSION=$1
+PHP_VERSION=$1
 
-if [ "$TRAVIS_PHP_VERSION" == "5.6" ]
+if [[ "$PHP_VERSION" =~ ^nightly$ || "$PHP_VERSION" =~ ^8 ]]
+then
+	php composer require phpunit/phpunit:^9.3 --dev --update-with-all-dependencies --ignore-platform-reqs
+fi
+
+if [ "$PHP_VERSION" == "5.6" ]
 then
 	vendor/bin/phpunit --coverage-clover=coverage.clover
 	wget https://scrutinizer-ci.com/ocular.phar

@@ -11,9 +11,11 @@
 
 namespace FastImageSize\Tests;
 
+use PHPUnit\Framework\TestCase;
+
 require_once __DIR__ . '/../vendor/autoload.php';
 
-class FastImageSize extends \PHPUnit_Framework_TestCase
+class FastImageSize extends TestCase
 {
 	/** @var \FastImageSize\FastImageSize */
 	protected $imageSize;

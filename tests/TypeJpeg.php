@@ -11,9 +11,11 @@
 
 namespace FastImageSize\Tests;
 
+use PHPUnit\Framework\TestCase;
+
 require_once __DIR__ . '/../vendor/autoload.php';
 
-class TypeJpeg extends \PHPUnit_Framework_TestCase
+class TypeJpeg extends TestCase
 {
 	/** @var \FastImageSize\FastImageSize */
 	protected $imagesize;

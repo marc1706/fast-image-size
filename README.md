@@ -20,7 +20,7 @@ It currently supports the following image types:
 
 ### Requirements
 
-PHP 5.3.0 or newer is required for this library to work.
+PHP 7.1.0 or newer is required for this library to work.
 
 ### Installation
 
@@ -28,7 +28,7 @@ It is recommend to install the library using composer.
 Just add the following snippet to your composer.json:
 ```
   "require": {
-    "marc1706/fast-image-size": "1.*"
+    "marc1706/fast-image-size": "^1.2"
   },
 ```
 
@@ -59,7 +59,7 @@ $imageSize = array(
 
 The library is being tested using unit tests to prevent possible issues.
 
-[![Build Status](https://travis-ci.org/marc1706/fast-image-size.svg?branch=master)](https://travis-ci.org/marc1706/fast-image-size)
+[![CI](https://github.com/marc1706/fast-image-size/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/marc1706/fast-image-size/actions/workflows/ci.yml)
 [![Code Coverage](https://scrutinizer-ci.com/g/marc1706/fast-image-size/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/marc1706/fast-image-size/?branch=master)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/marc1706/fast-image-size/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/marc1706/fast-image-size/?branch=master)
 

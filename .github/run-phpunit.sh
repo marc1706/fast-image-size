@@ -21,8 +21,6 @@ fi
 if [ "$PHP_VERSION" == "7.1" ]
 then
 	vendor/bin/phpunit --coverage-clover=coverage.clover
-	wget https://scrutinizer-ci.com/ocular.phar
-	php ocular.phar code-coverage:upload --format=php-clover coverage.clover
 else
 	vendor/bin/phpunit
 fi

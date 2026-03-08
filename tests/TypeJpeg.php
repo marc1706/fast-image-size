@@ -26,7 +26,7 @@ class TypeJpeg extends TestCase
 	/** @var string Path to fixtures */
 	protected $path;
 
-	public function setUp()
+	public function setUp(): void
 	{
 		parent::setUp();
 		$this->imagesize = new \FastImageSize\FastImageSize();
@@ -36,13 +36,13 @@ class TypeJpeg extends TestCase
 
 	public function dataJpegTest()
 	{
-		return array(
-			array(false, "\xFF\xD8somemorerandomdata1"),
-			array(false, "\xFF\xD8somedata\xFF\xE0\xFF\xFF\xFF\xFF"),
-			array(false,
+		return [
+			[false, "\xFF\xD8somemorerandomdata1"],
+			[false, "\xFF\xD8somedata\xFF\xE0\xFF\xFF\xFF\xFF"],
+			[false,
 				"\xFF\xD8somedata\xFF\xC0\xFF\xFF\xFF\xFF\xFF\xFF\xFF"
-			),
-		);
+			],
+		];
 	}
 
 	/**

@@ -152,7 +152,11 @@ class FastImageSize extends TestCase
 				'width'		=> 1100,
 				'height'	=> 729,
 				'type'		=> IMAGETYPE_JPEG,
-			], 'http://www.techspot.com/articles-info/1121/images/P34WS-12.jpg']
+			], 'http://www.techspot.com/articles-info/1121/images/P34WS-12.jpg'],
+			[
+				false,
+				'https://www.google.com/just_some_random_test_for_a_dummy_url_that_hopefully_never_exists/articles-info/1121/images/P34WS-12.jpg'
+			],
 		];
 	}
 

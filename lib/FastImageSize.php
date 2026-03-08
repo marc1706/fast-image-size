@@ -182,11 +182,11 @@ class FastImageSize
 	 *
 	 * @return false|string Image data or false if result was empty
 	 */
-	public function getImage($filename, $offset, $length, $forceLength = true)
+	public function getImage(string $filename, int $offset, int $length, bool $forceLength = true)
 	{
 		if (empty($this->data))
 		{
-			$this->data = @file_get_contents($filename, false, null, $offset, $length);
+			$this->data = $this->retrieveImageData($filename, $offset, $length);
 		}
 
 		// Force length to expected one. Return false if data length
@@ -197,6 +197,50 @@ class FastImageSize
 		}
 
 		return empty($this->data) ? false : $this->data;
+	}
+
+	/**
+	 * Retrieve image data from specified path/source
+	 *
+	 * @param string $filename Path to image
+	 * @param int $offset Offset at which reading of the image should start
+	 * @param int $max_length Maximum length that should be read
+	 *
+	 * @return false|string Image data or false if result was empty
+	 */
+	protected function retrieveImageData(string $filename, int $offset, int $max_length)
+	{
+		$context = stream_context_create([
+			'http' => [
+				'ignore_errors' => true
+			]
+		]);
+
+		// Use @ to suppress warnings from connection/DNS/SSL failures
+		$content = @file_get_contents($filename, false, $context, $offset, $max_length);
+
+		if (function_exists('http_get_last_response_headers'))
+		{
+			$http_response_header = http_get_last_response_headers();
+		}
+
+		if (isset($http_response_header))
+		{
+			// Find the LAST occurrence of "HTTP/" in the headers array
+			$statusLine = '';
+			foreach (array_reverse($http_response_header) as $header)
+			{
+				if (strpos($header, 'HTTP/') === 0)
+				{
+					$statusLine = $header;
+					break;
+				}
+			}
+
+			return strpos($statusLine, '200 OK') !== false ? $content : false;
+		}
+
+		return $content;
 	}
 
 	/**

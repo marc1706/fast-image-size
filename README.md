@@ -20,7 +20,7 @@ It currently supports the following image types:
 
 ### Requirements
 
-PHP 7.1.0 or newer is required for this library to work.
+PHP 7.2.0 or newer is required for this library to work.
 
 ### Installation
 

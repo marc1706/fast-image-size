@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace FastImageSize\Tests;
+namespace FastImageSize\tests;
 
 use PHPUnit\Framework\TestCase;
 

@@ -18,7 +18,7 @@ then
 	composer require phpunit/phpunit:^9.3 --dev --update-with-all-dependencies --ignore-platform-reqs
 fi
 
-if [ "$PHP_VERSION" == "7.1" ]
+if [ "$PHP_VERSION" == "7.2" ]
 then
 	vendor/bin/phpunit --coverage-clover=coverage.clover
 else

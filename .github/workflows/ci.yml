@@ -48,3 +48,5 @@ jobs:
       - name: Upload Scrutinizer coverage
         if: ${{ hashFiles('coverage.clover') != '' }}
         uses: sudo-bot/action-scrutinizer@latest
+        with:
+          cli-args: "--format=php-clover coverage.clover --revision=${{ github.event.pull_request.head.sha || github.sha }}"

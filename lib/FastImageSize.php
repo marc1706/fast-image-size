@@ -176,7 +176,7 @@ class FastImageSize
 	 *
 	 * @param string $filename Path to image
 	 * @param int $offset Offset at which reading of the image should start
-	 * @param int $length Maximum length that should be read
+	 * @param int $length Maximum length that should be read, must be greater than 0
 	 * @param bool $forceLength True if the length needs to be the specified
 	 *			length, false if not. Default: true
 	 *
@@ -186,7 +186,7 @@ class FastImageSize
 	{
 		if (empty($this->data))
 		{
-			$this->data = $this->retrieveImageData($filename, $offset, $length);
+			$this->data = $this->retrieveImageData($filename, $offset, $length) ?: '';
 		}
 
 		// Force length to expected one. Return false if data length

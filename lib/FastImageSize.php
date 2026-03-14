@@ -87,24 +87,53 @@ class FastImageSize
 		$this->resetValues();
 
 		// Treat image type as unknown if extension or mime type is unknown
-		if (!preg_match('/\.([a-z0-9]+)$/i', $file, $match) && empty($type))
+		$fileExtension = $this->getFileExtension($file);
+		if (empty($fileExtension) && empty($type))
 		{
 			$this->getImagesizeUnknownType($file);
 		}
 		else
 		{
-			$extension = (empty($type) && isset($match[1])) ? $match[1] : preg_replace('/.+\/([a-z0-9-.]+)$/i', '$1', $type);
+			$extension = $this->selectImageExtension($fileExtension, $type);
 
 			$this->getImageSizeByExtension($file, $extension);
 			
-			if (!count($this->size))
+			if (count($this->size) < 2)
 			{
 				$this->data = '';
 				$this->getImagesizeUnknownType($file);
 			}
 		}
 
-		return sizeof($this->size) > 1 ? $this->size : false;
+		return count($this->size) > 1 ? $this->size : false;
+	}
+
+	/**
+	 * Get file extension from supplied file path
+	 *
+	 * @param string $file Path to file
+	 * @return string File extension if found, empty string if not
+	 */
+	protected function getFileExtension(string $file): string
+	{
+		if (preg_match('/\.([a-z0-9]+)$/i', $file, $match))
+		{
+			return $match[1];
+		}
+
+		return '';
+	}
+
+	/**
+	 * Select image extension to use for retrieving dimensions
+	 *
+	 * @param string $fileExtension File extension from file path
+	 * @param string $type Mimetype of image
+	 * @return string Image extension to use for retrieving dimensions
+	 */
+	protected function selectImageExtension(string $fileExtension, string $type): string
+	{
+		return (empty($type) && !empty($fileExtension)) ? $fileExtension : preg_replace('/.+\/([a-z0-9-.]+)$/i', '$1', $type);
 	}
 
 	/**
@@ -124,7 +153,7 @@ class FastImageSize
 			{
 				$imageType->getSize($filename);
 
-				if (sizeof($this->size) > 1)
+				if (count($this->size) > 1)
 				{
 					break;
 				}
@@ -256,7 +285,7 @@ class FastImageSize
 	 */
 	protected function getReturnData()
 	{
-		return sizeof($this->size) > 1 ? $this->size : false;
+		return count($this->size) > 1 ? $this->size : false;
 	}
 
 	/**

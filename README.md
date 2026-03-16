@@ -55,6 +55,18 @@ $imageSize = array(
 );
 ```
 
+### Configuration
+
+You can set stream context options using the `setStreamContextOptions()` method. This allows you to customize the request, for example by setting a timeout for remote images:
+
+```
+$imageSize->setStreamContextOptions([
+	'http' => [
+		'timeout' => 5.0,
+	],
+]);
+```
+
 ### Automated Tests
 
 The library is being tested using unit tests to prevent possible issues.

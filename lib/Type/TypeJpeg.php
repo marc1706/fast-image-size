@@ -184,7 +184,7 @@ class TypeJpeg extends TypeBase
 	{
 		if (!$sofStartRead)
 		{
-			while ($this->data[$i] !== self::SOF_START_MARKER)
+			while ($i < $this->dataLength && $this->data[$i] !== self::SOF_START_MARKER)
 			{
 				$i++;
 			}

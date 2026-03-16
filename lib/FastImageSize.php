@@ -77,8 +77,9 @@ class FastImageSize
 	/** @var array Stream context options for retrieving remote images */
 	protected $streamContextOptions = [
 		'http' => [
+			'timeout' => 5.0,
 			'ignore_errors' => true,
-		]
+		],
 	];
 
 	/**

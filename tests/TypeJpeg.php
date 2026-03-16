@@ -58,4 +58,29 @@ class TypeJpeg extends TestCase
 
 		@unlink($this->path . 'test_file.jpg');
 	}
+
+	public function testSkipStartPaddingInfiniteLoop()
+	{
+		// Set data
+		$reflection = new \ReflectionClass($this->typeJpeg);
+		$propertyData = $reflection->getProperty('data');
+		$propertyData->setAccessible(true);
+		$data = "some data without SOF start marker";
+		$propertyData->setValue($this->typeJpeg, $data);
+
+		$propertyLength = $reflection->getProperty('dataLength');
+		$propertyLength->setAccessible(true);
+		$propertyLength->setValue($this->typeJpeg, strlen($data));
+
+		// Invoke method
+		$method = $reflection->getMethod('skipStartPadding');
+		$method->setAccessible(true);
+
+		$i = 0;
+		$sofStartRead = false;
+
+		$method->invokeArgs($this->typeJpeg, [&$i, &$sofStartRead]);
+
+		$this->assertEquals(strlen($data), $i);
+	}
 }

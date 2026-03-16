@@ -29,6 +29,7 @@ class RemoteImageTest extends TestCase
 			if ($path === "/200") { header("HTTP/1.1 200 OK"); echo "data"; }
 			if ($path === "/403") { header("HTTP/1.1 403 Forbidden"); echo "error"; }
 			if ($path === "/redirect") { header("Location: /200", true, 301); }
+			if ($path === "/timeout") { sleep(5); header("HTTP/1.1 200 OK"); echo "data"; }
 		';
 		file_put_contents(self::$router_file, $code);
 
@@ -135,5 +136,23 @@ class RemoteImageTest extends TestCase
 		$result = $this->get_final_content("/tmp/this_file_does_not_exist_123.txt");
 		$result = $this->imageSize->getImage('/tmp/this_file_does_not_exist_123.txt', 0, 4, false);
 		$this->assertFalse($result);
+	}
+
+	public function test_returns_false_on_timeout()
+	{
+		// Backup original context options to restore later
+		$reflection = new \ReflectionClass($this->imageSize);
+		$property = $reflection->getProperty('streamContextOptions');
+		$property->setAccessible(true);
+		$originalOptions = $property->getValue($this->imageSize);
+
+		// Set a short timeout to trigger the timeout scenario
+		$timeoutOptions = array_merge($originalOptions, ['http' => ['timeout' => 1]]);
+		$this->imageSize->setStreamContextOptions($timeoutOptions);
+		$result = $this->imageSize->getImage(self::$server_url . '/timeout', 0, 4, false);
+		$this->assertFalse($result);
+
+		// Restore original context options
+		$this->imageSize->setStreamContextOptions($originalOptions);
 	}
 }

@@ -74,6 +74,13 @@ class FastImageSize
 	/** @var array An array containing the classes of supported image types */
 	protected $type;
 
+	/** @var array Stream context options for retrieving remote images */
+	protected $streamContextOptions = [
+		'http' => [
+			'ignore_errors' => true,
+		]
+	];
+
 	/**
 	 * Get image dimensions of supplied image
 	 *
@@ -245,11 +252,7 @@ class FastImageSize
 	 */
 	protected function retrieveImageData(string $filename, int $offset, int $max_length)
 	{
-		$context = stream_context_create([
-			'http' => [
-				'ignore_errors' => true
-			]
-		]);
+		$context = $this->create_stream_context();
 
 		// Use @ to suppress warnings from connection/DNS/SSL failures
 		$content = @file_get_contents($filename, false, $context, $offset, $max_length);
@@ -279,13 +282,23 @@ class FastImageSize
 	}
 
 	/**
-	 * Get return data
+	 * Set stream context options for retrieving remote images
 	 *
-	 * @return array|bool Size array if dimensions could be found, false if not
+	 * @param array $options Stream context options
 	 */
-	protected function getReturnData()
+	public function setStreamContextOptions(array $options)
 	{
-		return count($this->size) > 1 ? $this->size : false;
+		$this->streamContextOptions = $options;
+	}
+
+	/**
+	 * Create stream context for retrieving remote images
+	 *
+	 * @return resource Stream context
+	 */
+	protected function create_stream_context()
+	{
+		return stream_context_create($this->streamContextOptions);
 	}
 
 	/**

@@ -40,17 +40,6 @@ class TypeWebp extends TypeBase
 	protected $size;
 
 	/**
-	 * Constructor for webp image type. Adds missing constant if necessary.
-	 */
-	public function __construct()
-	{
-		if (!defined('IMAGETYPE_WEBP'))
-		{
-			define('IMAGETYPE_WEBP', 18);
-		}
-	}
-
-	/**
 	 * {@inheritdoc}
 	 */
 	public function getSize(string $filename, ImageReader $imageReader): ?array

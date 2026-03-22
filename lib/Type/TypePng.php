@@ -11,6 +11,8 @@
 
 namespace FastImageSize\Type;
 
+use FastImageSize\ImageReader;
+
 class TypePng extends TypeBase
 {
 	/** @var string PNG header */
@@ -22,21 +24,21 @@ class TypePng extends TypeBase
 	/**
 	 * {@inheritdoc}
 	 */
-	public function getSize($filename)
+	public function getSize(string $filename, ImageReader $imageReader): ?array
 	{
 		// Retrieve image data including the header, the IHDR tag, and the
 		// following 2 chunks for the image width and height
-		$data = $this->fastImageSize->getImage($filename, 0, self::PNG_IHDR_OFFSET + 3 * self::LONG_SIZE);
+		$data = $imageReader->getImage($filename, 0, self::PNG_IHDR_OFFSET + 3 * self::LONG_SIZE);
 
 		// Check if header fits expected format specified by RFC 2083
-		if (substr($data, 0, self::PNG_IHDR_OFFSET - self::LONG_SIZE) !== self::PNG_HEADER || substr($data, self::PNG_IHDR_OFFSET, self::LONG_SIZE) !== 'IHDR')
+		if ($data === false || substr($data, 0, self::PNG_IHDR_OFFSET - self::LONG_SIZE) !== self::PNG_HEADER || substr($data, self::PNG_IHDR_OFFSET, self::LONG_SIZE) !== 'IHDR')
 		{
-			return;
+			return null;
 		}
 
 		$size = unpack('Nwidth/Nheight', substr($data, self::PNG_IHDR_OFFSET + self::LONG_SIZE, self::LONG_SIZE * 2));
+		$size['type'] = IMAGETYPE_PNG;
 
-		$this->fastImageSize->setSize($size);
-		$this->fastImageSize->setImageType(IMAGETYPE_PNG);
+		return $size;
 	}
 }

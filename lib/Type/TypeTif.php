@@ -11,6 +11,8 @@
 
 namespace FastImageSize\Type;
 
+use FastImageSize\ImageReader;
+
 class TypeTif extends TypeBase
 {
 	/** @var int TIF header size. The header might be larger but the dimensions
@@ -47,18 +49,23 @@ class TypeTif extends TypeBase
 	/**
 	 * {@inheritdoc}
 	 */
-	public function getSize($filename)
+	public function getSize(string $filename, ImageReader $imageReader): ?array
 	{
 		// Do not force length of header
-		$data = $this->fastImageSize->getImage($filename, 0, self::TIF_HEADER_SIZE, false);
+		$data = $imageReader->getImage($filename, 0, self::TIF_HEADER_SIZE, false);
 
-		$this->size = array();
+		if ($data === false)
+		{
+			return null;
+		}
+
+		$this->size = [];
 
 		$signature = substr($data, 0, self::SHORT_SIZE);
 
-		if (!in_array($signature, array(self::TIF_SIGNATURE_INTEL, self::TIF_SIGNATURE_MOTOROLA)))
+		if ($signature !== self::TIF_SIGNATURE_INTEL && $signature !== self::TIF_SIGNATURE_MOTOROLA)
 		{
-			return;
+			return null;
 		}
 
 		// Set byte type
@@ -71,7 +78,7 @@ class TypeTif extends TypeBase
 		$ifdSizeInfo = substr($data, $offset, self::SHORT_SIZE);
 		if (empty($ifdSizeInfo))
 		{
-			return;
+			return null;
 		}
 		list(, $sizeIfd) = unpack($this->typeShort, $ifdSizeInfo);
 
@@ -99,7 +106,7 @@ class TypeTif extends TypeBase
 			$offset += self::TIF_IFD_ENTRY_SIZE;
 		}
 
-		$this->fastImageSize->setSize($this->size);
+		return $this->size;
 	}
 
 	/**
@@ -107,7 +114,7 @@ class TypeTif extends TypeBase
 	 *
 	 * @param string $signature Header signature
 	 */
-	public function setByteType($signature)
+	public function setByteType(string $signature): void
 	{
 		if ($signature === self::TIF_SIGNATURE_INTEL)
 		{
@@ -130,7 +137,7 @@ class TypeTif extends TypeBase
 	 * @param int $fieldLength Length of field. Either short or long
 	 * @param string $ifdValue String value of IFD field
 	 */
-	protected function setSizeInfo($dimensionType, $fieldLength, $ifdValue)
+	protected function setSizeInfo(int $dimensionType, int $fieldLength, string $ifdValue): void
 	{
 		// Set size of field
 		$fieldSize = $fieldLength === self::TIF_TAG_TYPE_SHORT ? $this->typeShort : $this->typeLong;

@@ -11,19 +11,21 @@
 
 namespace FastImageSize\Type;
 
+use FastImageSize\ImageReader;
+
 class TypeWbmp extends TypeBase
 {
 	/**
 	 * {@inheritdoc}
 	 */
-	public function getSize($filename)
+	public function getSize(string $filename, ImageReader $imageReader): ?array
 	{
-		$data = $this->fastImageSize->getImage($filename, 0, self::LONG_SIZE);
+		$data = $imageReader->getImage($filename, 0, self::LONG_SIZE);
 
 		// Check if image is WBMP
 		if ($data === false || !$this->validWBMP($data))
 		{
-			return;
+			return null;
 		}
 
 		$size = unpack('Cwidth/Cheight', substr($data, self::SHORT_SIZE, self::SHORT_SIZE));
@@ -32,21 +34,21 @@ class TypeWbmp extends TypeBase
 		// rather easily (see extra check for JPEG2000).
 		if (!$this->validDimensions($size))
 		{
-			return;
+			return null;
 		}
 
-		$this->fastImageSize->setSize($size);
-		$this->fastImageSize->setImageType(IMAGETYPE_WBMP);
+		$size['type'] = IMAGETYPE_WBMP;
+		return $size;
 	}
 
 	/**
 	 * Return if supplied data might be part of a valid WBMP file
 	 *
-	 * @param bool|string $data
+	 * @param string $data
 	 *
 	 * @return bool True if data might be part of a valid WBMP file, else false
 	 */
-	protected function validWBMP($data)
+	protected function validWBMP(string $data): bool
 	{
 		return ord($data[0]) === 0 && ord($data[1]) === 0 && $data !== substr(TypeJp2::JPEG_2000_SIGNATURE, 0, self::LONG_SIZE);
 	}
@@ -58,7 +60,7 @@ class TypeWbmp extends TypeBase
 	 *
 	 * @return bool True if dimensions are valid, false if not
 	 */
-	protected function validDimensions($size)
+	protected function validDimensions(array $size): bool
 	{
 		return $size['height'] > 0 && $size['width'] > 0;
 	}

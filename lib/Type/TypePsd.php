@@ -11,6 +11,8 @@
 
 namespace FastImageSize\Type;
 
+use FastImageSize\ImageReader;
+
 class TypePsd extends TypeBase
 {
 	/** @var string PSD signature */
@@ -25,13 +27,13 @@ class TypePsd extends TypeBase
 	/**
 	 * {@inheritdoc}
 	 */
-	public function getSize($filename)
+	public function getSize(string $filename, ImageReader $imageReader): ?array
 	{
-		$data = $this->fastImageSize->getImage($filename, 0, self::PSD_HEADER_SIZE);
+		$data = $imageReader->getImage($filename, 0, self::PSD_HEADER_SIZE);
 
 		if ($data === false)
 		{
-			return;
+			return null;
 		}
 
 		// Offset for version info is length of header but version is only a
@@ -41,13 +43,13 @@ class TypePsd extends TypeBase
 		// Check if supplied file is a PSD file
 		if (!$this->validPsd($data, $version))
 		{
-			return;
+			return null;
 		}
 
 		$size = unpack('Nheight/Nwidth', substr($data, self::PSD_DIMENSIONS_OFFSET, 2 * self::LONG_SIZE));
+		$size['type'] = IMAGETYPE_PSD;
 
-		$this->fastImageSize->setSize($size);
-		$this->fastImageSize->setImageType(IMAGETYPE_PSD);
+		return $size;
 	}
 
 	/**
@@ -58,7 +60,7 @@ class TypePsd extends TypeBase
 	 *
 	 * @return bool True if image is a valid PSD file, false if not
 	 */
-	protected function validPsd($data, $version)
+	protected function validPsd(string $data, array $version): bool
 	{
 		return substr($data, 0, self::LONG_SIZE) === self::PSD_SIGNATURE && $version[1] === 1;
 	}

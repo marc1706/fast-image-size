@@ -11,7 +11,7 @@
 
 namespace FastImageSize\Type;
 
-use \FastImageSize\FastImageSize;
+use FastImageSize\ImageReader;
 
 class TypeWebp extends TypeBase
 {
@@ -41,13 +41,9 @@ class TypeWebp extends TypeBase
 
 	/**
 	 * Constructor for webp image type. Adds missing constant if necessary.
-	 *
-	 * @param FastImageSize $fastImageSize
 	 */
-	public function __construct(FastImageSize $fastImageSize)
+	public function __construct()
 	{
-		parent::__construct($fastImageSize);
-
 		if (!defined('IMAGETYPE_WEBP'))
 		{
 			define('IMAGETYPE_WEBP', 18);
@@ -57,10 +53,15 @@ class TypeWebp extends TypeBase
 	/**
 	 * {@inheritdoc}
 	 */
-	public function getSize($filename)
+	public function getSize(string $filename, ImageReader $imageReader): ?array
 	{
 		// Do not force length of header
-		$data = $this->fastImageSize->getImage($filename, 0, self::WEBP_HEADER_SIZE);
+		$data = $imageReader->getImage($filename, 0, self::WEBP_HEADER_SIZE);
+
+		if ($data === false)
+		{
+			return null;
+		}
 
 		$this->size = array();
 
@@ -68,15 +69,15 @@ class TypeWebp extends TypeBase
 
 		if (!$this->hasWebpHeader($data) || !$this->isValidFormat($webpFormat))
 		{
-			return;
+			return null;
 		}
 
 		$data = substr($data, 16, 14);
 
-		$this->getWebpSize($data, $webpFormat);
+		$this->setWebpSize($data, $webpFormat);
+		$this->size['type'] = IMAGETYPE_WEBP;
 
-		$this->fastImageSize->setSize($this->size);
-		$this->fastImageSize->setImageType(IMAGETYPE_WEBP);
+		return $this->size;
 	}
 
 	/**
@@ -86,7 +87,7 @@ class TypeWebp extends TypeBase
 	 *
 	 * @return bool True if $data has valid WebP header, false if not
 	 */
-	protected function hasWebpHeader($data)
+	protected function hasWebpHeader(string $data): bool
 	{
 		$riffSignature = substr($data, 0, self::LONG_SIZE);
 		$webpSignature = substr($data, 8, self::LONG_SIZE);
@@ -102,7 +103,7 @@ class TypeWebp extends TypeBase
 	 * @param string $format Format string
 	 * @return bool True if format is valid WebP format, false if not
 	 */
-	protected function isValidFormat($format)
+	protected function isValidFormat(string $format): bool
 	{
 		return in_array($format, array(self::WEBP_FORMAT_SIMPLE, self::WEBP_FORMAT_LOSSLESS, self::WEBP_FORMAT_EXTENDED));
 	}
@@ -113,7 +114,7 @@ class TypeWebp extends TypeBase
 	 * @param string $data Data string
 	 * @param string $format Format string
 	 */
-	protected function getWebpSize($data, $format)
+	protected function setWebpSize(string $data, string $format): void
 	{
 		switch ($format)
 		{

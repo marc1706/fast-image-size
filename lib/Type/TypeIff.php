@@ -11,6 +11,8 @@
 
 namespace FastImageSize\Type;
 
+use FastImageSize\ImageReader;
+
 class TypeIff extends TypeBase
 {
 	/** @var int IFF header size. Grab more than what should be needed to make
@@ -47,16 +49,21 @@ class TypeIff extends TypeBase
 	/**
 	 * {@inheritdoc}
 	 */
-	public function getSize($filename)
+	public function getSize(string $filename, ImageReader $imageReader): ?array
 	{
-		$data = $this->fastImageSize->getImage($filename, 0, self::IFF_HEADER_SIZE);
+		$data = $imageReader->getImage($filename, 0, self::IFF_HEADER_SIZE);
+
+		if ($data === false)
+		{
+			return null;
+		}
 
 		$signature = $this->getIffSignature($data);
 
 		// Check if image is IFF
 		if ($signature === false)
 		{
-			return;
+			return null;
 		}
 
 		// Set type constraints
@@ -65,19 +72,19 @@ class TypeIff extends TypeBase
 		// Get size from data
 		$btmhdPosition = strpos($data, $this->btmhd);
 		$size = unpack("{$this->byteType}width/{$this->byteType}height", substr($data, $btmhdPosition + self::LONG_SIZE + strlen($this->btmhd), $this->btmhdSize));
+		$size['type'] = IMAGETYPE_IFF;
 
-		$this->fastImageSize->setSize($size);
-		$this->fastImageSize->setImageType(IMAGETYPE_IFF);
+		return $size;
 	}
 
 	/**
 	 * Get IFF signature from data string
 	 *
-	 * @param string|bool $data Image data string
+	 * @param string $data Image data string
 	 *
 	 * @return false|string Signature if file is a valid IFF file, false if not
 	 */
-	protected function getIffSignature($data)
+	protected function getIffSignature(string $data)
 	{
 		$signature = substr($data, 0, self::LONG_SIZE);
 
@@ -97,7 +104,7 @@ class TypeIff extends TypeBase
 	 *
 	 * @param string $signature IFF signature of image
 	 */
-	protected function setTypeConstraints($signature)
+	protected function setTypeConstraints(string $signature): void
 	{
 		// Amiga version of IFF
 		if ($signature === 'FORM')

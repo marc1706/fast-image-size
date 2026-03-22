@@ -11,6 +11,8 @@
 
 namespace FastImageSize\Type;
 
+use FastImageSize\ImageReader;
+
 class TypeBmp extends TypeBase
 {
 	/** @var int BMP header size needed for retrieving dimensions */
@@ -25,19 +27,24 @@ class TypeBmp extends TypeBase
 	/**
 	 * {@inheritdoc}
 	 */
-	public function getSize($filename)
+	public function getSize(string $filename, ImageReader $imageReader): ?array
 	{
-		$data = $this->fastImageSize->getImage($filename, 0, self::BMP_HEADER_SIZE);
+		$data = $imageReader->getImage($filename, 0, self::BMP_HEADER_SIZE);
+
+		if ($data === false)
+		{
+			return null;
+		}
 
 		// Check if supplied file is a BMP file
 		if (substr($data, 0, 2) !== self::BMP_SIGNATURE)
 		{
-			return;
+			return null;
 		}
 
 		$size = unpack('lwidth/lheight', substr($data, self::BMP_DIMENSIONS_OFFSET, 2 * self::LONG_SIZE));
+		$size['type'] = IMAGETYPE_BMP;
 
-		$this->fastImageSize->setSize($size);
-		$this->fastImageSize->setImageType(IMAGETYPE_BMP);
+		return $size;
 	}
 }

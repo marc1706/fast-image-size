@@ -167,4 +167,21 @@ class FastImageSize extends TestCase
 	{
 		$this->assertSame($expected, $this->imageSize->getImageSize($url));
 	}
+
+	public function test_memory_usage()
+	{
+		$mem_start = memory_get_usage();
+		for ($i = 0; $i < 50000; $i++) {
+
+			$FastImageSize = new \FastImageSize\FastImageSize();
+			$path = $this->path . "jpg.JPG";
+			$imageSize = $FastImageSize->getImageSize($path);
+			unset($FastImageSize);
+			unset($imageSize);
+		}
+		$mem_end = memory_get_usage();
+
+		// Memory usage should be more or less the same after 50.000 calls, so we allow a small increase of 512 bytes
+		$this->assertLessThan(512, $mem_end - $mem_start);
+	}
 }

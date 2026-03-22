@@ -11,6 +11,8 @@
 
 namespace FastImageSize\Type;
 
+use FastImageSize\ImageReader;
+
 interface TypeInterface
 {
 	/** @var int 4-byte long size */
@@ -23,8 +25,9 @@ interface TypeInterface
 	 * Get size of supplied image
 	 *
 	 * @param string $filename File name of image
+	 * @param ImageReader $imageReader Image reader
 	 *
-	 * @return null
+	 * @return array|null Size info or null if failed
 	 */
-	public function getSize($filename);
+	public function getSize(string $filename, ImageReader $imageReader): ?array ;
 }

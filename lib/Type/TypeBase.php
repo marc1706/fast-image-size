@@ -11,20 +11,20 @@
 
 namespace FastImageSize\Type;
 
-use \FastImageSize\FastImageSize;
+use FastImageSize\ImageReader;
 
 abstract class TypeBase implements TypeInterface
 {
-	/** @var FastImageSize */
-	protected $fastImageSize;
-
 	/**
-	 * Base constructor for image types
+	 * Get size of supplied image
 	 *
-	 * @param FastImageSize $fastImageSize
+	 * @param string $filename File name of image
+	 * @param ImageReader $imageReader Image reader
+	 *
+	 * @return array|null Size info or null if failed
 	 */
-	public function __construct(FastImageSize $fastImageSize)
+	public function getSize(string $filename, ImageReader $imageReader): ?array
 	{
-		$this->fastImageSize = $fastImageSize;
+		return null;
 	}
 }

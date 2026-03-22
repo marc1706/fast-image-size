@@ -11,6 +11,8 @@
 
 namespace FastImageSize\Type;
 
+use FastImageSize\ImageReader;
+
 class TypeJp2 extends TypeBase
 {
 	/** @var string JPEG 2000 signature */
@@ -25,14 +27,19 @@ class TypeJp2 extends TypeBase
 	/**
 	 * {@inheritdoc}
 	 */
-	public function getSize($filename)
+	public function getSize(string $filename, ImageReader $imageReader): ?array
 	{
-		$data = $this->fastImageSize->getImage($filename, 0, TypeJpeg::JPEG_MAX_HEADER_SIZE, false);
+		$data = $imageReader->getImage($filename, 0, TypeJpeg::JPEG_MAX_HEADER_SIZE, false);
+
+		if ($data === false)
+		{
+			return null;
+		}
 
 		// Check if file is jpeg 2000
 		if (substr($data, 0, strlen(self::JPEG_2000_SIGNATURE)) !== self::JPEG_2000_SIGNATURE)
 		{
-			return;
+			return null;
 		}
 
 		// Get SOC position before starting to search for SIZ.
@@ -44,8 +51,8 @@ class TypeJp2 extends TypeBase
 
 		// Acquire size info from data
 		$size = unpack('Nwidth/Nheight', substr($data, self::LONG_SIZE, self::LONG_SIZE * 2));
+		$size['type'] = IMAGETYPE_JPEG2000;
 
-		$this->fastImageSize->setSize($size);
-		$this->fastImageSize->setImageType(IMAGETYPE_JPEG2000);
+		return $size;
 	}
 }

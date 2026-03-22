@@ -142,9 +142,12 @@ class RemoteImageTest extends TestCase
 	{
 		// Backup original context options to restore later
 		$reflection = new \ReflectionClass($this->imageSize);
-		$property = $reflection->getProperty('streamContextOptions');
+		$imageReaderReflection = $reflection->getProperty('imageReader');
+		$imageReaderReflection->setAccessible(true);
+		$imageReader = $imageReaderReflection->getValue($this->imageSize);
+		$property = new \ReflectionProperty(get_class($imageReader), 'streamContextOptions');
 		$property->setAccessible(true);
-		$originalOptions = $property->getValue($this->imageSize);
+		$originalOptions = $property->getValue($imageReader);
 
 		// Set a short timeout to trigger the timeout scenario
 		$timeoutOptions = array_merge($originalOptions, ['http' => ['timeout' => 1]]);

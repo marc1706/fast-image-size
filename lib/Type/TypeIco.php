@@ -11,6 +11,8 @@
 
 namespace FastImageSize\Type;
 
+use FastImageSize\ImageReader;
+
 class TypeIco extends TypeBase
 {
 	/** @var string ICO reserved field */
@@ -22,27 +24,27 @@ class TypeIco extends TypeBase
 	/**
 	 * {@inheritdoc}
 	 */
-	public function getSize($filename)
+	public function getSize(string $filename, ImageReader $imageReader): ?array
 	{
 		// Retrieve image data for ICO header and header of first entry.
 		// We assume the first entry to have the same size as the other ones.
-		$data = $this->fastImageSize->getImage($filename, 0, 2 * self::LONG_SIZE);
+		$data = $imageReader->getImage($filename, 0, 2 * self::LONG_SIZE);
 
 		if ($data === false)
 		{
-			return;
+			return null;
 		}
 
 		// Check if header fits expected format
 		if (!$this->isValidIco($data))
 		{
-			return;
+			return null;
 		}
 
 		$size = unpack('Cwidth/Cheight', substr($data, self::LONG_SIZE + self::SHORT_SIZE, self::SHORT_SIZE));
+		$size['type'] = IMAGETYPE_ICO;
 
-		$this->fastImageSize->setSize($size);
-		$this->fastImageSize->setImageType(IMAGETYPE_ICO);
+		return $size;
 	}
 
 	/**
@@ -52,7 +54,7 @@ class TypeIco extends TypeBase
 	 *
 	 * @return bool True if file is a valid ICO file, false if not
 	 */
-	protected function isValidIco($data)
+	protected function isValidIco(string $data): bool
 	{
 		// Get header
 		$header = unpack('vreserved/vtype/vimages', $data);

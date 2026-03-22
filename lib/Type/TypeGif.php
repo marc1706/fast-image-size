@@ -11,6 +11,8 @@
 
 namespace FastImageSize\Type;
 
+use FastImageSize\ImageReader;
+
 class TypeGif extends TypeBase
 {
 	/** @var string GIF87a header */
@@ -25,21 +27,26 @@ class TypeGif extends TypeBase
 	/**
 	 * {@inheritdoc}
 	 */
-	public function getSize($filename)
+	public function getSize(string $filename, ImageReader $imageReader): ?array
 	{
 		// Get data needed for reading image dimensions as outlined by GIF87a
 		// and GIF89a specifications
-		$data = $this->fastImageSize->getImage($filename, 0, self::GIF_HEADER_SIZE + self::SHORT_SIZE * 2);
+		$data = $imageReader->getImage($filename, 0, self::GIF_HEADER_SIZE + self::SHORT_SIZE * 2);
+
+		if ($data === false)
+		{
+			return null;
+		}
 
 		$type = substr($data, 0, self::GIF_HEADER_SIZE);
 		if ($type !== self::GIF87A_HEADER && $type !== self::GIF89A_HEADER)
 		{
-			return;
+			return null;
 		}
 
 		$size = unpack('vwidth/vheight', substr($data, self::GIF_HEADER_SIZE, self::SHORT_SIZE * 2));
+		$size['type'] = IMAGETYPE_GIF;
 
-		$this->fastImageSize->setSize($size);
-		$this->fastImageSize->setImageType(IMAGETYPE_GIF);
+		return $size;
 	}
 }

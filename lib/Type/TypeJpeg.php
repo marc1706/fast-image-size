@@ -11,6 +11,8 @@
 
 namespace FastImageSize\Type;
 
+use FastImageSize\ImageReader;
+
 class TypeJpeg extends TypeBase
 {
 	/** @var int JPEG max header size. Headers can be bigger, but we'll abort
@@ -52,22 +54,22 @@ class TypeJpeg extends TypeBase
 	/**
 	 * {@inheritdoc}
 	 */
-	public function getSize($filename)
+	public function getSize(string $filename, ImageReader $imageReader): ?array
 	{
 		// Do not force the data length
-		$this->data = $this->fastImageSize->getImage($filename, 0, self::JPEG_MAX_HEADER_SIZE, false);
+		$this->data = $imageReader->getImage($filename, 0, self::JPEG_MAX_HEADER_SIZE, false);
 
 		// Check if file is jpeg
 		if ($this->data === false || substr($this->data, 0, self::SHORT_SIZE) !== self::JPEG_HEADER)
 		{
-			return;
+			return null;
 		}
 
 		// Look through file for SOF marker
 		$size = $this->getSizeInfo();
+		$size['type'] = IMAGETYPE_JPEG;
 
-		$this->fastImageSize->setSize($size);
-		$this->fastImageSize->setImageType(IMAGETYPE_JPEG);
+		return $size;
 	}
 
 	/**
@@ -76,7 +78,7 @@ class TypeJpeg extends TypeBase
 	 * @return array An array with the image's size info or an empty array if
 	 *		size info couldn't be found
 	 */
-	protected function getSizeInfo()
+	protected function getSizeInfo(): array
 	{
 		$size = array();
 		// since we check $i + 1 we need to stop one step earlier
@@ -118,15 +120,13 @@ class TypeJpeg extends TypeBase
 	 * @param int $i Current index
 	 * @return int Length of current marker
 	 */
-	protected function extractMarkerLength($i)
+	protected function extractMarkerLength(int $i): int
 	{
 		// Extract length only
 		list(, $unpacked) = unpack("H*", substr($this->data, $i, self::LONG_SIZE));
 
-		// Get width and height from unpacked size info
-		$markerLength = hexdec(substr($unpacked, 0, 4));
-
-		return $markerLength;
+		// Return width and height from unpacked size info
+		return hexdec(substr($unpacked, 0, 4));
 	}
 
 	/**
@@ -135,18 +135,16 @@ class TypeJpeg extends TypeBase
 	 * @param int $i Current index
 	 * @return array Size info of current marker
 	 */
-	protected function extractSizeInfo($i)
+	protected function extractSizeInfo(int $i): array
 	{
 		// Extract size info from SOF marker
 		list(, $unpacked) = unpack("H*", substr($this->data, $i - 1 + self::LONG_SIZE, self::LONG_SIZE));
 
-		// Get width and height from unpacked size info
-		$size = array(
+		// Return width and height from unpacked size info
+		return [
 			'width'		=> hexdec(substr($unpacked, 4, 4)),
 			'height'	=> hexdec(substr($unpacked, 0, 4)),
-		);
-
-		return $size;
+		];
 	}
 
 	/**
@@ -157,18 +155,20 @@ class TypeJpeg extends TypeBase
 	 *
 	 * @return string Next JPEG marker in file
 	 */
-	protected function getNextMarker(&$i, &$sofStartRead)
+	protected function getNextMarker(int &$i, bool &$sofStartRead): string
 	{
 		$this->skipStartPadding($i, $sofStartRead);
 
-		do {
+		do
+		{
 			if ($i >= $this->dataLength)
 			{
 				return self::JPEG_EOI_MARKER;
 			}
 			$marker = $this->data[$i];
 			$i++;
-		} while ($marker == self::SOF_START_MARKER);
+		}
+		while ($marker == self::SOF_START_MARKER);
 
 		return $marker;
 	}
@@ -180,7 +180,7 @@ class TypeJpeg extends TypeBase
 	 * @param int $i Current index
 	 * @param bool $sofStartRead Flag whether SOF start padding was already read
 	 */
-	protected function skipStartPadding(&$i, &$sofStartRead)
+	protected function skipStartPadding(int &$i, bool &$sofStartRead): void
 	{
 		if (!$sofStartRead)
 		{

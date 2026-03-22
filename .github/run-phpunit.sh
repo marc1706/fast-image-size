@@ -15,7 +15,7 @@ PHP_VERSION=$1
 
 if [[ "$PHP_VERSION" =~ ^nightly$ || "$PHP_VERSION" =~ ^8 ]]
 then
-	composer require phpunit/phpunit:^9.3 --dev --update-with-all-dependencies --ignore-platform-reqs
+	composer require phpunit/phpunit:^9.3 doctrine/instantiator:^1.5 --dev --update-with-all-dependencies --ignore-platform-reqs
 fi
 
 if [ "$PHP_VERSION" == "7.2" ]

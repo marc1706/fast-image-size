@@ -20,7 +20,7 @@ fi
 
 if [ "$PHP_VERSION" == "7.2" ]
 then
-	vendor/bin/phpunit --coverage-clover=coverage.clover
+	vendor/bin/phpunit --coverage-clover=coverage.clover --verbose
 else
-	vendor/bin/phpunit
+	vendor/bin/phpunit --verbose
 fi

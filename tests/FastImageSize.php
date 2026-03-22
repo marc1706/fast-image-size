@@ -199,17 +199,17 @@ class FastImageSize extends TestCase
 	 */
 	public function testGetEmptyData($imageType = 'jp2')
 	{
-		$file_reader = $this->getMockBuilder(\FastImageSize\ImageReader::class)
+		$fileReader = $this->getMockBuilder(\FastImageSize\ImageReader::class)
 			->disableOriginalConstructor()
 			->onlyMethods(['getImage'])
 			->getMock();
-		$file_reader->method('getImage')
+		$fileReader->method('getImage')
 			->willReturn(false);
 
 		$className = '\FastImageSize\Type\Type' . ucfirst($imageType);
 		$typeInstance = new $className();
 
-		$this->assertNull($typeInstance->getSize('dummy', $file_reader));
+		$this->assertNull($typeInstance->getSize('dummy', $fileReader));
 	}
 
 	public function testLoadInvalidType()

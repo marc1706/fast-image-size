@@ -184,4 +184,38 @@ class FastImageSize extends TestCase
 		// Memory usage should be more or less the same after 50.000 calls, so we allow a small increase of 512 bytes
 		$this->assertLessThan(512, $mem_end - $mem_start);
 	}
+
+	public static function dataGetEmptyData(): array
+	{
+		return [
+			['jp2'],
+			['tif'],
+			['webp'],
+		];
+	}
+
+	/**
+	 * @dataProvider dataGetEmptyData
+	 */
+	public function testGetEmptyData($imageType = 'jp2')
+	{
+		$file_reader = $this->getMockBuilder(\FastImageSize\ImageReader::class)
+			->disableOriginalConstructor()
+			->onlyMethods(['getImage'])
+			->getMock();
+		$file_reader->method('getImage')
+			->willReturn(false);
+
+		$className = '\FastImageSize\Type\Type' . ucfirst($imageType);
+		$typeInstance = new $className();
+
+		$this->assertNull($typeInstance->getSize('dummy', $file_reader));
+	}
+
+	public function testLoadInvalidType()
+	{
+		$loadTypeReflection = new \ReflectionMethod(\FastImageSize\FastImageSize::class, 'loadType');
+		$loadTypeReflection->setAccessible(true);
+		$this->assertNull($loadTypeReflection->invoke($this->imageSize, 'invalid'));
+	}
 }

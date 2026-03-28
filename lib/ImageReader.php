@@ -66,30 +66,7 @@ class ImageReader
 		$context = $this->create_stream_context();
 
 		// Use @ to suppress warnings from connection/DNS/SSL failures
-		$content = @file_get_contents($filename, false, $context, $offset, $max_length);
-
-		if (function_exists('http_get_last_response_headers'))
-		{
-			$http_response_header = http_get_last_response_headers();
-		}
-
-		if (isset($http_response_header))
-		{
-			// Find the LAST occurrence of "HTTP/" in the headers array
-			$statusLine = '';
-			foreach (array_reverse($http_response_header) as $header)
-			{
-				if (strpos($header, 'HTTP/') === 0)
-				{
-					$statusLine = $header;
-					break;
-				}
-			}
-
-			return strpos($statusLine, '200 OK') !== false ? $content : false;
-		}
-
-		return $content;
+		return @file_get_contents($filename, false, $context, $offset, $max_length);
 	}
 
 	/**

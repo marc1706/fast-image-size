@@ -77,51 +77,16 @@ class RemoteImageTest extends TestCase
 		$this->imageSize = new \FastImageSize\FastImageSize();
 	}
 
-	private function get_final_content($path)
-	{
-		$context = stream_context_create([
-			'http' => [
-				//'ignore_errors' => true,
-				'timeout' => 2,
-				'follow_location' => 1
-			]
-		]);
-
-		$content = @file_get_contents($path, false, $context);
-
-		if (!isset($http_response_header))
-		{
-			return $content;
-		}
-
-		$status_line = '';
-		foreach (array_reverse($http_response_header) as $header)
-		{
-			if (strpos($header, 'HTTP/') === 0)
-			{
-				$status_line = $header;
-				break;
-			}
-		}
-
-		if (strpos($status_line, ' 200 ') !== false)
-		{
-			return $content;
-		}
-
-		return false;
-	}
-
 	public function test_returns_content_on_200_ok()
 	{
 		$result = $this->imageSize->getImage(self::$server_url . '/200', 0, 4, false);
 		$this->assertEquals("data", $result);
 	}
 
-	public function test_returns_false_on_403_forbidden()
+	public function test_returns_error_on_403_forbidden()
 	{
 		$result = $this->imageSize->getImage(self::$server_url . '/403', 0, 5, false);
-		$this->assertFalse($result);
+		$this->assertEquals("error", $result);
 	}
 
 	public function test_returns_content_after_successful_redirect()
@@ -133,7 +98,6 @@ class RemoteImageTest extends TestCase
 	public function test_returns_false_for_missing_local_file()
 	{
 		// Testing local file failure (Local "403/404")
-		$result = $this->get_final_content("/tmp/this_file_does_not_exist_123.txt");
 		$result = $this->imageSize->getImage('/tmp/this_file_does_not_exist_123.txt', 0, 4, false);
 		$this->assertFalse($result);
 	}
@@ -157,5 +121,13 @@ class RemoteImageTest extends TestCase
 
 		// Restore original context options
 		$this->imageSize->setStreamContextOptions($originalOptions);
+	}
+
+	public function test_local_file_after_remote()
+	{
+		$result = $this->imageSize->getImage(self::$server_url . '/403', 0, 5, false);
+		$this->assertEquals('error', $result);
+
+		$this->assertEquals(['width' => 1, 'height' => 1, 'type' => IMAGETYPE_PNG], $this->imageSize->getImageSize(__DIR__ . '/fixture/png', 'image/png'));
 	}
 }
